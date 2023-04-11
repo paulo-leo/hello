@@ -3,6 +3,17 @@
     "description":"O microframework para desenvolvimento web rápido, desacoplado e escalável.",
     "license": "MIT",
     "minimum-stability":"dev",
+    "authors": [
+      {
+          "name": "Paulo Leonardo da Silva Cassimiro",
+          "email": "paulo@hellomf.com",
+          "homepage": "https://hellomf.com",
+          "role": "Developer"
+      }
+    ],
+    "require": {
+      "php": ">=8.0.0"
+    },
     "autoload": {
         "psr-4": {
             "Kernel\\":"kernel/",
