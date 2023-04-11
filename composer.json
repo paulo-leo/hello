@@ -2,7 +2,7 @@
     "name":"paulo-leo/hello",
     "description":"O microframework para desenvolvimento web rápido, desacoplado e escalável.",
     "license": "MIT",
-    "minimum-stability":"beta",
+    "minimum-stability":"stable",
     "authors": [
       {
           "name": "Paulo Leonardo da Silva Cassimiro",
