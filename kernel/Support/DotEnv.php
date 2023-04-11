@@ -7,11 +7,41 @@ class DotEnv
     private $file;
     public function __construct($file)
     {
-        if (!file_exists($file)) {
-            throw new \Exception("Arquivo .env não encontrado.");
+        if (!file_exists($file))
+        {
+            file_put_contents($file,$this->contentSimpleFileDotEnv());
         }
+
         $this->file = $file;
         $this->parseFile($file);
+    }
+
+    private function createKeyAPIDontEnv()
+    {
+        $ip = get_ip();
+        $date = date('Y-m-d H:i:s').date('F j, Y, g:i a');
+        $token = md5("{$date}{$ip}{$date}");
+        $token = hash_hmac('sha256', $token, md5($token));
+        return $token;
+    }
+
+    private function contentSimpleFileDotEnv()
+    {
+       $token = $this->createKeyAPIDontEnv();
+       $code = "#Informações do aplicativo\n";
+       $code .= "APP_NAME=Hello\n";
+       $code .= "APP_DESCRIPTION=\n";
+       $code .= "APP_VERSION=\n";
+       $code .= "APP_KEY={$token}\n";
+       $code .= "APP_LANG=pt-br\n\n";
+       $code .= "#Banco de dados\n";
+       $code .= "DB_CONNECTION=mysql\n";
+       $code .= "DB_HOST=localhost\n";
+       $code .= "DB_DATABASE=root\n";
+       $code .= "DB_USERNAME=\n";
+       $code .= "DB_PASSWORD=\n";
+       $code .= "DB_DRIVER=mysql";
+       return $code;
     }
 
     private function parseFile($file)

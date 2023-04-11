@@ -109,6 +109,26 @@ function secret($secret)
   return (strlen($secret) >= 4) ? md5("{$secret}-{$app_key}-{$secret}") : false;
 }
 
+function get_ip() {
+  // Verifica se o endereço IP do usuário é passado através de um proxy reverso
+  if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+      $ip_address = $_SERVER['HTTP_CLIENT_IP'];
+  }
+  // Verifica se o endereço IP do usuário é passado através de um proxy
+  elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+  }
+  // Obtém o endereço IP do usuário
+  else {
+      $ip_address = $_SERVER['REMOTE_ADDR'];
+  }
+  
+   $ipv4_address = filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+  
+   return $ipv4_address ? $ipv4_address : $ip_address;
+}
+
+
 
 function dir_delete($dir) {
   if (!file_exists($dir)) {
@@ -180,10 +200,6 @@ function service($name)
 {
   return Vars::get('ServiceProvider')->getService($name);
 }
-
-
-
-
 
 if (!Vars::get('ServiceProvider')->checkStop())
 {

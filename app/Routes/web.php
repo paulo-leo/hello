@@ -6,10 +6,10 @@ Route::get('/',function(){
     return view('welcome');
 });
 
-Route::get('*',function(){
-    return view('404');
+Route::get('about',function(){
+    return view('about');
 });
 
-Route::get('blog',function(){
-    return view('@blog.home');
+Route::get('*',function(){
+    return view('404');
 });
