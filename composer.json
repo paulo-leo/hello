@@ -2,12 +2,10 @@
     "name":"paulo-leo/hello",
     "description":"O microframework para desenvolvimento web rápido, desacoplado e escalável.",
     "license": "MIT",
-    "minimum-stability":"stable",
+    "minimum-stability":"dev",
     "authors": [
       {
           "name": "Paulo Leonardo da Silva Cassimiro",
-          "email": "paulo@hellomf.com",
-          "homepage": "https://hellomf.com",
           "role": "Developer"
       }
     ],
