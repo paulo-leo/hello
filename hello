@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$_SERVER['REQUEST_METHOD'] = count($argv) >= 1 ? 'TERM' : 'GET';
+
+Kernel\Support\Hello::setLine($argv);
+
+if (!function_exists('getallheaders')) {
+    function getallheaders() {
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+}
+
+
+$app = require_once __DIR__.'/bootstrap.php';
