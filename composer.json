@@ -1,4 +1,8 @@
 {
+    "name":"paulo-leo/hello",
+    "description":"O microframework para desenvolvimento web rápido, desacoplado e escalável.",
+    "license": "MIT",
+    "minimum-stability":"dev",
     "autoload": {
         "psr-4": {
             "Kernel\\":"kernel/",
