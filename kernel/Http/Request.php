@@ -114,33 +114,34 @@ class Request
         return $value;
 	}
 
-    private function checkSize($size,$value)
+    private function checkSize($size,$value,$number=false)
     {    
         if(is_null($value)) return true;
-
+        $size = str_ireplace(['-','&','and'],',',$size);
         $size = explode(',',$size);  
-        $min = (int) $size[0];
-        $max = (int) isset($size[1]) ? $size[1] : $min;
+        $min = (float) $size[0];
+        $max = (float) isset($size[1]) ? $size[1] : $min;
 
-        $value = is_numeric($value) ? (float) $value : strlen($value);
+        if($number && is_numeric($value))
+        {
+           $value = (float) $value;
+        }else{
+            $value = strlen($value);
+        }
 
         return ($value >= $min && $value <= $max); 
     }
 
-    public function validation($validations,$value=null)
+    public function validations(array $validations)
     {
-        if(!is_array($validations))
+        foreach($validations as $key=>$value)
         {
-            $value = is_string($value) ? explode('|',$value) : $value;
-            $this->_validations_keys[$validations] = $value; 
-        }else{
+          if(!$this->has($key)) $this->set($key);
 
-        foreach($validations as $k=>$v)
-        {
-          if(!$this->has($k)) $this->set($k);
-          $v = is_string($v) ? explode('|',$v) : $v;
+          $value = is_string($value) ? explode('|',$value) : $value;
+          
+          $this->_validations_keys[$key] = $value; 
         }
-      }
     }
 
     private function checkInValue($key, $value)
@@ -162,11 +163,25 @@ class Request
               if(!$value) $this->__check *= 0;
            }
 
+           if(substr($key,0,7) == 'length:')
+           {
+              $key = substr($key,7);
+              if(!$this->checkSize($key,$value))
+                $this->__check *= 0;
+           }
+
            if(substr($key,0,5) == 'size:')
            {
               $key = substr($key,5);
-              if(!$this->checkSize($key,$value))
+              if(!$this->checkSize($key,$value,true))
                 $this->__check *= 0;
+           }
+
+           if($key == 'email')
+           {
+              $er = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}";
+              $value = preg_match("/^{$er}$/", $value);
+              if(!$value) $this->__check *= 0;
            }
 
            if($key == 'required' && is_null($value))
