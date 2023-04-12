@@ -76,7 +76,8 @@ class View
    {
       $viewPath = $this->getViewPath($view);
 
-      if (!$viewPath) {
+      if (!$viewPath)
+      {
          throw new Exception("Não foi possível encontrar o arquivo de visualização para '{$view}'.");
       }
 
@@ -88,18 +89,15 @@ class View
 
       $compiledPath = $this->local($this->cache . '/' . md5($viewPath) . '.php');
 
-      if (!$this->needsRecompilation($viewPath, $compiledPath)) {
-         include($compiledPath);
-         return;
+      if ($this->needsRecompilation($viewPath, $compiledPath)) 
+      {
+           $content = file_get_contents($viewPath);
+           $content = $this->transform($content);
+           $content = $this->writeCompiledFile($compiledPath, $content);
+        
       }
 
-      $content = file_get_contents($viewPath);
-
-      $content = $this->transform($content);
-
-      $content = $this->writeCompiledFile($compiledPath, $content);
-
-      echo $content;
+      include($compiledPath);
    }
 
    private function getViewPath($view)
