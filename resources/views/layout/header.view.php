@@ -1,10 +1,17 @@
 <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-white shadow bg-white">
       <div class="container">
         <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="{{url()}}">{{env('APP_NAME')}}</a>
+        <a class="navbar-brand position-relative" href="{{url()}}">
+          <img src="{{url('img/logo.jpeg')}}" width="32">
+          <span style="position:relative;top:3px">{{env('APP_NAME')}}</span>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          Alpha
+  </span>
+        </a>
+  
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
@@ -87,4 +94,25 @@
     body {
       margin-bottom: 60px;
     }
+
+    .btn-purple {
+  color: #fff !important;
+  background-color: #6f42c1;
+  border-color: #6f42c1;
+}
+
+.btn-purple:hover {
+  color: #fff;
+  background-color: #5a32b0;
+  border-color: #4829a9;
+}
+
+a {
+  color: #6f42c1 !important;
+}
+
+a:hover {
+  color: #5a32b0;
+  text-decoration: none;
+}
   </style>

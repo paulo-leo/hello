@@ -120,7 +120,7 @@ function get_ip() {
   }
   // Obtém o endereço IP do usuário
   else {
-      $ip_address = $_SERVER['REMOTE_ADDR'];
+      $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
   }
   
    $ipv4_address = filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);

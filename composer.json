@@ -3,6 +3,7 @@
     "description":"O microframework para desenvolvimento web rápido, desacoplado e escalável.",
     "license": "MIT",
     "minimum-stability":"dev",
+    "version": "1.0.0-alpha",
     "authors": [
       {
           "name": "Paulo Leonardo da Silva Cassimiro",
