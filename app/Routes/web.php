@@ -24,8 +24,7 @@ Route::get('teste',function(){
    var_dump($request->get("nome"));
 
    $request->validations([
-    'nome'=>'length:3&100|email',
-    'idade'=>'required'
+    'nome'=>'length:3&100|email'
    ]);
 
   var_dump($request->check());
