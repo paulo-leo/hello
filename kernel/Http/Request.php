@@ -156,31 +156,42 @@ class Request
         if (!$validations)
             return true;
 
-        foreach ($validations as $key) {
+        foreach ($validations as $key)
+        {
             $key = trim($key);
             $key = str_ireplace(' ', '', $key);
-
             $key = explode(':', $key);
             $argument = $key[1] ?? '';
             $key = $key[0];
 
 
-
+            $value = $this->get($name);
             $pattern = $this->getPattern($key, $argument);
-
-            if ($pattern) {
+            
+            if ($pattern && $value)
+            {
                 $value = preg_match($pattern, $this->get($name));
-                if (!$value) {
-                    array_push($this->error_keys, "{$name}.{$key}");
+                if (!$value)
+                {
+                    $key_v = "{$name}.{$key}";
+                    $this->error_keys[$key_v] = $key_v;
                     $this->__check *= 0;
                 }
+            }
+
+            if($key == 'required' && !$value)
+            {
+                  $key_v = "{$name}.{$key}";
+                  $this->error_keys[$key_v] = $key_v;
+                  $this->__check *= 0;
             }
         }
     }
 
     public function check()
     {
-        foreach ($this->all() as $key => $value) {
+        foreach ($this->all() as $key => $value)
+        {
             $this->checkInValue($key, $this->get($key));
         }
         return $this->__check;
@@ -194,7 +205,8 @@ class Request
             $name = explode('.', $error)[0];
             $value = $this->errors[$error] ?? false;
 
-            if ($value) {
+            if ($value)
+            {
                 $messages[] = str_replace('{value}', $this->get($name), $value);
             }
         }
