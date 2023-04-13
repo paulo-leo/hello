@@ -3,72 +3,53 @@
 namespace Kernel\Http;
 
 use Kernel\FS\ReadArray;
+use Kernel\Http\RuleRequest;
 
 class Request
 {
-
-    /*
-    required: O campo é obrigatório.
-    email: O campo deve conter um endereço de e-mail válido.
-    numeric: O campo deve ser um número.
-    integer: O campo deve ser um número inteiro.
-    digits: O campo deve ter um número específico de dígitos.
-    min: O valor mínimo permitido para o campo.
-    max: O valor máximo permitido para o campo.
-    between: O valor do campo deve estar entre um intervalo específico.
-    in: O campo deve corresponder a um valor específico de uma lista.
-    not_in: O campo não deve corresponder a nenhum valor específico de uma lista.
-    alpha: O campo deve conter somente caracteres alfabéticos.
-    alpha_num: O campo deve conter somente caracteres alfanuméricos.
-    alpha_dash: O campo deve conter somente caracteres alfanuméricos, sublinhados e hífens.
-    regex: O campo deve corresponder a uma expressão regular específica.
-    confirmed: O campo deve ser confirmado por outro campo com o mesmo nome seguido de "_confirmation".
-    unique: O valor do campo deve ser único em uma determinada tabela de banco de dados.
-    exists: O valor do campo deve existir em uma determinada tabela de banco de dados.
-    */
-
     private $__all;
     private $__check;
     private $__files;
-    private $erros;
-    private $erros_person;
+    private $errors;
+    private $errors_person;
     private $__values;
     private $allHeaders;
     private $request;
     private $_value;
-    private $_validations;
-    private $_validations_keys;
+    private $_validations = array();
+    private $validated = array();
+    private $_validations_keys = array();
 
-    private $_patterns = array(
-        'email' => '/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/',
-        'date' => '/^(0?[1-9]|1[0-2])\/(0?[1-9]|[12][0-9]|3[01])\/\d{4}$/',
-        'time' => '/^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/',
-        'phone' => '/^(\+?\d{1,2}\s?)?(\(\d{2}\)|\d{2})\s?\d{4,5}\-\d{4}$/',
-        'url' => '/^https?:\/\/(?:www\.)?[a-zA-Z0-9\-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?\/?.*$/',
-        'datetime' => '/^\d{4}-\d{2}-\d{2}[T\s]([01]\d|2[0-3]):[0-5]\d:[0-5]\d$/'
-    );
+    private $_patterns = array();
 
-    private function getPattern($pattern)
+    private $error_keys = array();
+
+    private function getPattern($pattern, $argument = null)
     {
         $pattern = $this->_patterns[$pattern] ?? false;
+        $pattern = $pattern ? str_replace(['#i', '{argument}'], $argument, $pattern) : $pattern;
+        return $pattern;
     }
 
-    protected function setPattern($pattern,$value)
+    protected function setPattern($pattern, $value)
     {
         $this->_patterns[$pattern] = $value;
+    }
+    
+    protected function setMessage($key,$message)
+    {
+        $this->errors[$key] = $message;
     }
 
 
     public function __construct()
     {
-        $this->erros_person = array();
-        $this->erros = array();
+        $this->_patterns = RuleRequest::patterns();
+        $this->errors_person = array();
+        $this->errors = array();
         $this->__values = array();
         $this->__files = array();
         $this->__check = 1;
-        $this->_validations_keys = array();
-
-        $this->_validations = new ReadArray('config/validations.php');
 
         /*Salva todos os headers dentro de um array associativo*/
         $this->allHeaders = $this->setAllHeaders();
@@ -78,7 +59,7 @@ class Request
             $this->__all = isset($_NP_REQUEST) ? $_NP_REQUEST : array();
         } else {
 
-            $_SERVER['REQUEST_METHOD']  = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'TERM';
+            $_SERVER['REQUEST_METHOD'] = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'TERM';
 
             switch ($_SERVER['REQUEST_METHOD']) {
                 case 'GET':
@@ -152,79 +133,47 @@ class Request
         return $value;
     }
 
-    private function checkSize($size, $value, $number = false)
-    {
-        if (is_null($value)) return true;
-        $size = str_ireplace(['-', '&', 'and'], ',', $size);
-        $size = explode(',', $size);
-        $min = (float) $size[0];
-        $max = (float) isset($size[1]) ? $size[1] : $min;
-
-        if ($number && is_numeric($value)) {
-            $value = (float) $value;
-        } else {
-            $value = strlen($value);
-        }
-
-        return ($value >= $min && $value <= $max);
-    }
-
-    public function validations(array $validations)
+    public function validate($validations, $messages = array())
     {
         foreach ($validations as $key => $value) {
-            if (!$this->has($key)) $this->set($key);
+            if (!$this->has($key))
+                $this->set($key);
 
+            array_push($this->validated, $key);
             $value = is_string($value) ? explode('|', $value) : $value;
 
-            $this->_validations_keys[$key] = $value;
+            $this->_validations[$key] = $value;
         }
+
+        $this->errors = $messages;
     }
 
     private function checkInValue($key, $value)
     {
-        $validations = isset($this->_validations_keys[$key]) ?
-            $this->_validations_keys[$key] : null;
+        $name = $key;
+        $validations = $this->_validations[$key] ?? false;
 
-        if (is_null($validations)) return true;
+        if (!$validations)
+            return true;
 
-        for ($i = 0; $i < count($validations); $i++) {
-            $key = trim($validations[$i]);
+        foreach ($validations as $key) {
+            $key = trim($key);
             $key = str_ireplace(' ', '', $key);
 
-            if ($this->_validations->has($key)) {
-                $p = $this->_validations->get($key);
-                $value = preg_match("/^{$p}$/", $value);
-                if (!$value) $this->__check *= 0;
-            }
+            $key = explode(':', $key);
+            $argument = $key[1] ?? '';
+            $key = $key[0];
 
-            if (substr($key, 0, 7) == 'length:') {
-                $key = substr($key, 7);
-                if (!$this->checkSize($key, $value))
+
+
+            $pattern = $this->getPattern($key, $argument);
+
+            if ($pattern) {
+                $value = preg_match($pattern, $this->get($name));
+                if (!$value) {
+                    array_push($this->error_keys, "{$name}.{$key}");
                     $this->__check *= 0;
-            }
-
-            if (substr($key, 0, 5) == 'size:') {
-                $key = substr($key, 5);
-                if (!$this->checkSize($key, $value, true))
-                    $this->__check *= 0;
-            }
-
-            if (substr($key, 0, 8) == 'pattern:') {
-                $er = substr($key, 8);
-                $value = preg_match("/^{$er}$/", $value ?? '');
-                if (!$value) $this->__check *= 0;
-            }
-
-            $pattern = $this->getPattern($key);
-            if ($pattern)
-            {
-                $value = $value ?? '';
-                $value = preg_match((string) $pattern, $value);
-                if (!$value) $this->__check *= 0;
-            }
-
-            if ($key == 'required' && is_null($value)) {
-                $this->__check *= 0;
+                }
             }
         }
     }
@@ -235,5 +184,41 @@ class Request
             $this->checkInValue($key, $this->get($key));
         }
         return $this->__check;
+    }
+
+    public function errors()
+    {
+        $this->check();
+        $messages = array();
+        foreach ($this->error_keys as $error) {
+            $name = explode('.', $error)[0];
+            $value = $this->errors[$error] ?? false;
+
+            if ($value) {
+                $messages[] = str_replace('{value}', $this->get($name), $value);
+            }
+        }
+        return $messages;
+    }
+
+    public function fails()
+    {
+        return !$this->check();
+    }
+
+    public function success()
+    {
+        return !$this->fails();
+    }
+
+    public function validated()
+    {
+        $validated = array();
+        if ($this->success()) {
+            foreach ($this->validated as $key) {
+                $validated[$key] = $this->get($key);
+            }
+        }
+        return $validated;
     }
 }
