@@ -21,7 +21,7 @@ Route::get('teste',function(){
    $request = new Request;
 
    $request->validate([
-    'nome'=>'min:2|max:5|regex:[paulo]{5}|email'
+    'nome'=>'min:2|max:5|regex:[paulo]{5}|email|required'
    ],
    [
     'nome.email'=>'E-mail inválido.',
@@ -30,13 +30,16 @@ Route::get('teste',function(){
     'nome.regex'=>'O valor "{value}" não bate com o padrão."'
    ]);
 
-   var_dump($request->errors());
+   
 
-   var_dump($request->fails());
-
-   var_dump($request->success());
-
-   var_dump($request->validated());
-
+   if($request->fails())
+   { 
+      
+      var_dump($request->errors());
+    
+   }else
+   {
+     return 'Dados validados:'.implode('|',$request->validated()); 
+   }
 
 });

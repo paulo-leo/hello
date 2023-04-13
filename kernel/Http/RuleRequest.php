@@ -30,7 +30,6 @@ class RuleRequest extends Request
   private static $patterns = array(
     'min' => '/^(.{#i,})$/',
     'max' => '/^(.{0,#i})$/',
-    'required' => '/^.+$/',
     'email' => '/^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$/',
     'date' => '/^(\d{4})-(0?[1-9]|1[0-2])-(0?[1-9]|[12][0-9]|3[01])$/',
     'time' => '/^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/',
@@ -52,8 +51,15 @@ class RuleRequest extends Request
     'exists' => 'exists'
    );
 
+   private static $messages_defaults = array();
+
    final public static function patterns()
    {
      return self::$patterns;
+   }
+   
+   final public static function messageDefault()
+   {
+     return self::$messages_defaults;
    }
 }

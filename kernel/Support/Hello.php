@@ -51,6 +51,9 @@ namespace Kernel\Support;
         {
          if(class_exists($command))
          {
+            if (ob_get_level() > 0) {
+               ob_end_flush();
+             }
             $class = new $command(self::$line);
             $output = $class->main();
             echo (is_array($output) || is_object($output)) ? json_encode((array) $output) : $output;
