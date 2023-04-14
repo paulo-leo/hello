@@ -1,8 +1,7 @@
 <?php
 
 use Kernel\Router\Route;
-use Kernel\Http\Request;
-use App\Forms\UserRequest;
+use App\Forms\Requests\UserRequest;
 
 Route::get('/',function(){
     return view('welcome');
@@ -21,8 +20,6 @@ Route::get('teste',function(){
 
    $request = new UserRequest;
 
-
-   
 
    if($request->fails())
    { 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Forms;
+namespace App\Forms\Requests;
 
 use Kernel\Http\FormRequest;
 
