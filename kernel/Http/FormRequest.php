@@ -4,20 +4,18 @@ namespace Kernel\Http;
 
 use Kernel\Http\Request;
 
-abstract class FormRequest extends Request
+abstract class FormRequest
 {
-    public function __construct()
+    private $request;
+    final public function __construct()
     {
-      foreach($this->rules() as $key=>$value)
-       {
-         $this->setPattern($key,$value);
-       }
+      $this->request = new Request;
+      $this->request()->validate($this->rules(),$this->messages());
+    }
 
-       foreach($this->message() as $key=>$message)
-       {
-         $this->setMessage($key,$message);
-       }
-       parent::__construct();
+    final public function request()
+    {
+      return $this->request;
     }
 
     protected function rules() 
@@ -25,9 +23,43 @@ abstract class FormRequest extends Request
       return array();
     }
 
-    protected function message() : array
+    protected function messages() 
     {
-        return array();
+      return array();
     }
 
+    final public function fails()
+    {
+      return $this->request()->fails();
+    }
+
+    final public function success()
+    {
+      return $this->request->success();
+    }
+
+    final public function errors()
+    {
+      return $this->request()->errors();
+    }
+
+    final public function validated()
+    {
+      return $this->request()->validated();
+    }
+
+    final public function all()
+    {
+      return $this->request()->all();
+    }
+
+    final public function get($key)
+    {
+      return $this->request()->get($key);
+    }
+
+    final public function set($key,$value)
+    {
+      return $this->request()->set($key,$value);
+    }
 }

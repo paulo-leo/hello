@@ -51,15 +51,21 @@ class RuleRequest extends Request
     'exists' => 'exists'
    );
 
-   private static $messages_defaults = array();
+   private static $messages_defaults = array(
+    'required'=>'O campo "{name}" é obrigatório.'
+   );
 
    final public static function patterns()
    {
      return self::$patterns;
    }
    
-   final public static function messageDefault()
+   final public static function messages()
    {
-     return self::$messages_defaults;
+     
+   }
+   final public static function getMessageDefault($key)
+   {
+    return self::$messages_defaults[$key] ?? false;
    }
 }

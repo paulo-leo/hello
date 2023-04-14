@@ -11,7 +11,6 @@ class Request
     private $__check;
     private $__files;
     private $errors;
-    private $errors_person;
     private $__values;
     private $allHeaders;
     private $request;
@@ -41,12 +40,9 @@ class Request
         $this->errors[$key] = $message;
     }
 
-
     public function __construct()
     {
         $this->_patterns = RuleRequest::patterns();
-        $this->errors_person = array();
-        $this->errors = array();
         $this->__values = array();
         $this->__files = array();
         $this->__check = 1;
@@ -202,12 +198,20 @@ class Request
         $this->check();
         $messages = array();
         foreach ($this->error_keys as $error) {
-            $name = explode('.', $error)[0];
-            $value = $this->errors[$error] ?? false;
 
-            if ($value)
+            $errors = explode('.', $error);
+            $name = $errors[0];
+            $key = $errors[1] ?? '';
+
+            $message = $this->errors[$error] ?? false;
+
+            if ($message)
             {
-                $messages[] = str_replace('{value}', $this->get($name), $value);
+                $messages[] = str_replace(['{name}','{value}'],[$name,$this->get($name)], $message);
+            }else{
+                 $key = RuleRequest::getMessageDefault($key);
+                 if($key) 
+                    $messages[] = str_replace(['{name}','{value}'],[$name,$this->get($name)], $key);
             }
         }
         return $messages;

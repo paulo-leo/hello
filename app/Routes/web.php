@@ -2,6 +2,7 @@
 
 use Kernel\Router\Route;
 use Kernel\Http\Request;
+use App\Forms\UserRequest;
 
 Route::get('/',function(){
     return view('welcome');
@@ -18,17 +19,8 @@ Route::get('*',function(){
 
 Route::get('teste',function(){
 
-   $request = new Request;
+   $request = new UserRequest;
 
-   $request->validate([
-    'nome'=>'min:2|max:5|regex:[paulo]{5}|email|required'
-   ],
-   [
-    'nome.email'=>'E-mail inválido.',
-    'nome.max'=>'O máximo permitido é 5',
-    'nome.min'=>'O mínimo permitido é 2',
-    'nome.regex'=>'O valor "{value}" não bate com o padrão."'
-   ]);
 
    
 
