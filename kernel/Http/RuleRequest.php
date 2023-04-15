@@ -68,4 +68,26 @@ class RuleRequest extends Request
    {
     return self::$messages_defaults[$key] ?? false;
    }
+
+   public function passes($name, $value)
+   {
+   }
+
+   public function message()
+   {
+     return '';
+   }
+
+   public function __construct()
+   {
+     self::$messages_defaults[$this->rule()] = $this->message();
+   }
+
+   final public function rule()
+   {
+     $class = get_called_class();
+     $class = str_replace('\\','_',$class);
+     $class = strtolower($class);
+     return $class;
+   }
 }

@@ -1,7 +1,7 @@
 <?php
 
 use Kernel\Router\Route;
-use App\Forms\Requests\UserRequest;
+use App\Validations\Forms\UserRequest;
 
 Route::get('/',function(){
     return view('welcome');
@@ -20,15 +20,8 @@ Route::get('teste',function(){
 
    $request = new UserRequest;
 
-
-   if($request->fails())
-   { 
-      
-      var_dump($request->errors());
-    
-   }else
-   {
-     return 'Dados validados:'.implode('|',$request->validated()); 
-   }
+   return $request->fails() ? 
+          $request->errors() : 
+          $request->validated(); 
 
 });

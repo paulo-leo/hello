@@ -113,14 +113,13 @@ class Request
 
     public function validate($validations, $messages = array())
     {
-        foreach ($validations as $key => $value) {
-            if (!$this->has($key))
-                $this->set($key);
+        foreach ($validations as $key => $value) 
+        {
+          if(!$this->has($key)) $this->set($key);
 
-            array_push($this->validated, $key);
-            $value = is_string($value) ? explode('|', $value) : $value;
-
-            $this->_validations[$key] = $value;
+          array_push($this->validated, $key);
+          $value = is_string($value) ? explode('|', $value) : $value;
+          $this->_validations[$key] = $value;
         }
 
         $this->errors = $messages;
@@ -136,12 +135,19 @@ class Request
 
         foreach ($validations as $key)
         {
+           if($key instanceof RuleRequest){
+              if(!$key->passes($name, $value))
+              {
+                $this->error_keys[$key->rule()] = "{$name}.{$key->rule()}";
+                $this->check *= 0;
+              }
+           }else
+           {
             $key = trim($key);
             $key = str_ireplace(' ', '', $key);
             $key = explode(':', $key);
             $argument = $key[1] ?? '';
             $key = $key[0];
-
 
             $value = $this->get($name);
             $pattern = $this->getPattern($key, $argument);
@@ -163,6 +169,7 @@ class Request
                   $this->error_keys[$key_v] = $key_v;
                   $this->check *= 0;
             }
+         }
         }
     }
 
