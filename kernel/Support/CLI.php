@@ -76,7 +76,13 @@ class CLI
       default:
         $color = "\033[0m";
     }
+
+    if (ob_get_level() > 0)
+    {
+      ob_end_flush();
+    }
     echo "{$color}{$value}\033[0m\n";
+    ob_start();
   }
 
   final protected function position(int $index): mixed
@@ -148,16 +154,17 @@ class CLI
       $this->print($cancel,"red");
       exit;
     }
+    $this->print('Ação confirmada e executada.',"green");
     ob_start();
   }
 
   final protected function input($msg=null)
   {
+    if(ob_get_level() > 0) ob_end_flush();
     $msg = $msg ?? 'Informe um valor para continuar:';
     echo "\n";
     echo "\033[34m".$msg;
     echo "\033[0m";
-    if (ob_get_level() > 0) ob_end_flush();
     $value = trim(fgets(STDIN));
     ob_start();
     return $value;
@@ -180,8 +187,10 @@ class CLI
 
   final protected function alertLine($message,$color=null)
   {
+    if (ob_get_level() > 0) ob_end_flush();
     echo "\n";
     $this->alert($message,$color);
     echo "\n";
+    ob_start();
   }
 }

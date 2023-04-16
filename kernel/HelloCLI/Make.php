@@ -19,22 +19,32 @@ class Make extends CLI
         if ($action == 'controller' && $name)
         {
             $this->createFile($name,$this->controller($name,$mod),'c',$mod);
-            $this->print('Controle de regra de negócio criado com sucesso.','green');
+            $this->alertLine('Controle de regra de negócio criado com sucesso.','success');
+        }
+        elseif ($action == 'request' && $name)
+        {
+            $this->createFile($name,$this->formRequest($name,$mod),'f',$mod);
+            $this->alertLine('Classe de requisição de formulário criada com sucesso.','success');
+        }
+        elseif ($action == 'rule' && $name)
+        {
+            $this->createFile($name,$this->ruleRequest($name,$mod),'r',$mod);
+            $this->alertLine('Classe de validação personalizada criada com sucesso.','success');
         }
         elseif($action == 'model' && $name)
         {
             $this->createFile($name,$this->model($name,$table,$mod),'m',$mod);
-            $this->print('Modelo de entidade de banco de dados criado com sucesso.','green');
+            $this->alertLine('Modelo de entidade de banco de dados criado com sucesso.','success');
         }
         elseif($action == 'service' && $name)
         {
             $this->createFile($name,$this->service($name,$mod),'s',$mod);
-            $this->print('Provedor de serviços criado com sucesso.','green');
+            $this->alertLine('Provedor de serviços criado com sucesso.','success');
         }
         elseif($action == 'middleware' && $name)
         {
             $this->createFile($name,$this->middleware($name,$mod),'mi',$mod);
-            $this->print('Middleware para rotas criado com sucesso.','green');
+            $this->alertLine('Middleware para rotas criado com sucesso.','success');
         }
         elseif($action == 'migration' && $name)
         {
@@ -42,8 +52,8 @@ class Make extends CLI
             {
                system("php hello migrate:create {$name} table={$table}");
             }else{
-                $this->print("Você deve informar o nome da tabela da sua migração conforme o exemplo abaixo:","red");
-                $this->print("php hello make:migration [name_migration] table=[name_table]","cyan");
+                $this->alertLine("Você deve informar o nome da tabela da sua migração conforme o exemplo abaixo:","warning");
+                $this->print("php hello make:migration [name_migration] table=[name_table]","yellow");
             }
         }
         elseif($action == 'view' && $name)
@@ -56,7 +66,7 @@ class Make extends CLI
            $file = $file ? $this->getFile($file) : "";
            $this->createFileLivre($name, $file);
         }else{
-            $this->print("Você deve informar um comando válido!","red");
+            $this->alertLine("Você deve informar um comando válido!","warning");
             $this->print("Exemplo: php hello make:[comando] [name]","yellow");  
         }
     }
@@ -82,7 +92,9 @@ class Make extends CLI
         'c' => !$mod ? "App\\Controllers" : "Modules\\{$mod}\\Controllers",
         'm' => !$mod ? "App\\Models" : "Modules\\{$mod}\\Models",
         's' => !$mod ? "App\\Services" : "Modules\\{$mod}\\Services",
-        'mi'=> !$mod ? "App\\Middlewares" : "Modules\\{$mod}\\Middlewares"
+        'mi'=> !$mod ? "App\\Middlewares" : "Modules\\{$mod}\\Middlewares",
+        'f'=> !$mod ? "App\\Validations\\Forms" : "Modules\\{$mod}\\Validations\\Forms",
+        'r'=> !$mod ? "App\\Validations\\Rules" : "Modules\\{$mod}\\Validations\\Rules"
       };
 
       $index = explode('/', $class);
@@ -114,6 +126,55 @@ class Make extends CLI
         $codigo .= "    public function index()\n";
         $codigo .= "    {\n";
         $codigo .= "        // Seu código aqui...\n";
+        $codigo .= "    }\n";
+        $codigo .= "}\n";
+        return $codigo;
+    }
+
+    private function formRequest($class,$mod)
+    {
+        $class = $this->getClassNamespace($class,'f',$mod);
+
+        $namespace = $class->namespace;
+        $class = $class->class;
+
+        $codigo = "<?php\n\n";
+        $codigo .= "namespace {$namespace};\n\n";
+        $codigo .= "use Kernel\Http\FormRequest;\n\n";
+        $codigo .= "class {$class} extends FormRequest\n";
+        $codigo .= "{\n";
+        $codigo .= "    public function rules()\n";
+        $codigo .= "    {\n";
+        $codigo .= "        return array();\n";
+        $codigo .= "    }\n";
+        $codigo .= "    public function messages()\n";
+        $codigo .= "    {\n";
+        $codigo .= "        return array();\n";
+        $codigo .= "    }\n";
+        $codigo .= "}\n";
+        return $codigo;
+    }
+
+    private function ruleRequest($class,$mod)
+    {
+        $class = $this->getClassNamespace($class,'r',$mod);
+
+        $namespace = $class->namespace;
+        $class = $class->class;
+
+        $codigo = "<?php\n\n";
+        $codigo .= "namespace {$namespace};\n\n";
+        $codigo .= "use Kernel\Http\RuleRequest;\n\n";
+        $codigo .= "class {$class} extends RuleRequest\n";
+        $codigo .= "{\n";
+        $codigo .= "    public function passes(\$name, \$value)\n";
+        $codigo .= "    {\n";
+        $codigo .= "        #Sua lógica de validação aqui.\n";
+        $codigo .= "        return true;\n";
+        $codigo .= "    }\n";
+        $codigo .= "    public function message()\n";
+        $codigo .= "    {\n";
+        $codigo .= "        return 'Sua mensagem de erro aqui.';\n";
         $codigo .= "    }\n";
         $codigo .= "}\n";
         return $codigo;
@@ -197,7 +258,9 @@ class Make extends CLI
             'm' => !$mod ? "app/Models": "modules/{$mod}/Models",
             's' => !$mod ? "app/Services": "modules/{$mod}/Services",
             'v' => !$mod ? "resources/views": "modules/{$mod}/Views",
-            'mi'=> !$mod ? "app/Middlewares": "modules/{$mod}/Middlewares"
+            'mi'=> !$mod ? "app/Middlewares": "modules/{$mod}/Middlewares",
+            'f'=> !$mod ? "app/Validations/Forms": "modules/{$mod}/Validations/Forms",
+            'r'=> !$mod ? "app/Validations/Rules": "modules/{$mod}/Validations/Rules"
         };
 
         $dir = $this->dir("{$namespace}/{$dir}");
@@ -212,7 +275,7 @@ class Make extends CLI
        if(file_exists($file))
        {
           $dir = $this->rootDir($dir);
-          $this->print("O arquivo especificado já existe no diretório informado.",'red');
+          $this-> alertLine("O arquivo especificado já existe no diretório informado.",'danger');
           $this->print("[root]/{$dir}");
           echo "\033[38;5;206m";
           system("cd {$dir};ls;");
@@ -234,8 +297,8 @@ class Make extends CLI
 
       fclose($handle);
       $file = $this->rootDir($file);
-      if($type == 'v'){  $this->print("Visualizador criado com sucesso.","yellow"); }
-      $this->print("Arquivo criado com sucesso em: {$file}","green");
+      if($type == 'v'){  $this->alertLine("Visualizador criado com sucesso.","info"); }
+      $this->alertLine("Arquivo criado com sucesso em: {$file}","info");
 
       // Definir permissões do arquivo recém-criado
       chmod($file, 0777);

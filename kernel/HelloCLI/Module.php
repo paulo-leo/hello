@@ -4,9 +4,8 @@ namespace Kernel\HelloCLI;
 
 use Kernel\Support\CLI;
 use Kernel\FS\ReadArray;
-use  ZipArchive;
 use Kernel\Support\Module as Mod;
-use Exception;
+use  ZipArchive;
 
 class Module extends CLI
 {
@@ -17,18 +16,24 @@ class Module extends CLI
     $name = ucfirst(trim($name));
 
     if ($action == 'create' && $name) {
+      $this->confirm();
       $this->createModule($name);
     } elseif ($action == 'on' && $name) {
+      $this->confirm();
       $this->onModule($name);
     } elseif ($action == 'off' && $name) {
+      $this->confirm();
       $this->offModule($name);
     } elseif ($action == 'add' && $name) {
+      $this->confirm();
       $this->registerModule($name);
     } elseif ($action == 'remove' && $name) {
+      $this->confirm();
       $this->removeModule($name);
     } elseif ($action == 'status' && $name) {
       $this->statusModule($name);
     } elseif ($action == 'pull' && $name) {
+      $this->confirm();
       $this->pullModule($name);
     } elseif ($action == 'info' && $name) {
       $this->getInfo($name);
@@ -84,34 +89,40 @@ class Module extends CLI
       mkdir("$dir/Models", 0777, true);
       mkdir("$dir/Views", 0777, true);
     } else {
-      $this->print("Já existe um diretório de módulo com o nome \"{$name}\".", "red");
+      $this->alertLine("Já existe um diretório de módulo com o nome \"{$name}\".", "danger");
       exit;
     }
 
     $class = $this->dir("$namespace/{$name}.php");
 
     if (file_put_contents($class, $this->createModuleFile($name)) !== false) {
-      $this->print("Arquivo de classe \"{$name}.php\" criado com sucesso.", "blue");
+      $this->alertLine("Arquivo de classe \"{$name}.php\" criado com sucesso.", "success");
     }
 
 
     $file = $this->dir("$namespace/mod.xml");
     if (file_put_contents($file, $this->xml($name)) !== false) {
-      $this->print("Arquivo descritivo \"mod.xml\" criado com sucesso.", "blue");
+      $this->alertLine("Arquivo descritivo \"mod.xml\" criado com sucesso.", "success");
     }
 
-    $this->print("Módulo \"{$name}\" criado com sucesso.", "green");
+    $this->alertLine("Módulo \"{$name}\" criado com sucesso.", "success");
   }
 
-  private function xml($name)
+  private function xml($dir)
   {
+
+    $name = $this->input('Nome do módulo:') ?? $dir;
+    $version = $this->input('Versão:') ?? '1.0.0';
+    $author = $this->input('Seu nome:') ?? 'Seu nome aqui.';
+
     $codigo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     $codigo .= "<module>\n";
+    $codigo .= "  <directory>{$dir}</directory>\n";
     $codigo .= "  <name>{$name}</name>\n";
     $codigo .= "  <uri></uri>\n";
     $codigo .= "  <description></description>\n";
-    $codigo .= "  <version>0.0.1</version>\n";
-    $codigo .= "  <author>Seu nome aqui!</author>\n";
+    $codigo .= "  <version>{$version}</version>\n";
+    $codigo .= "  <author>{$author}</author>\n";
     $codigo .= "  <image></image>\n";
     $codigo .= "  <screen_shots></screen_shots>\n";
     $codigo .= "  <keyworks></keyworks>\n";
@@ -127,12 +138,12 @@ class Module extends CLI
     $module = new ReadArray('config/modules.php');
 
     if ($module->has($name)) {
-      $this->print("Esse módulo já está registrado.", "yellow");
+      $this->alertLine("Esse módulo já está registrado.", "danger");
       exit;
     }
 
     if (!$this->checkModule($name)) {
-      $this->print("Não foi possível registrar este módulo, pois seus arquivos estão inválidos.", "red");
+      $this->alertLine("Não foi possível registrar este módulo, pois seus arquivos estão inválidos.", "danger");
       exit;
     }
 
@@ -141,7 +152,7 @@ class Module extends CLI
 
     $date = date('Y-m-d H:i:s');
     $this->print("{$date}", "blue");
-    $this->print("Módulo '{$name}' registrado com sucesso.", "green");
+    $this->alertLine("Módulo '{$name}' registrado com sucesso.", "success");
   }
 
   private function removeModule($name)
@@ -154,9 +165,9 @@ class Module extends CLI
 
       $date = date('Y-m-d H:i:s');
       $this->print("[REMOVE {$name} | {$date}]", "yellow");
-      $this->print("Módulo '{$name}' removido com sucesso.", "green");
+      $this->alertLine("Módulo '{$name}' removido com sucesso.", "success");
     } else {
-      $this->print("Esse módulo já foi removido.", "red");
+      $this->alertLine("Esse módulo já foi removido.", "danger");
     }
   }
 
@@ -165,17 +176,17 @@ class Module extends CLI
     $module = new ReadArray('config/modules.php');
 
     if (!$module->has($name)) {
-      $this->print("Não há nenhum módulo registrado com o nome '{$name}' para ativação.", "red");
+      $this->alertLine("Não há nenhum módulo registrado com o nome '{$name}' para ativação.", "waning");
       exit;
     }
 
     if ($module->get($name) == 'on') {
-      $this->print("Esse módulo já está ativo.", "red");
+      $this->alertLine("Esse módulo já está ativo.", "success");
       exit;
     }
 
     if (!$this->checkModule($name)) {
-      $this->print("Não foi possível ativar este módulo, pois seus arquivos estão inválidos.", "red");
+      $this->alertLine("Não foi possível ativar este módulo, pois seus arquivos estão inválidos.", "danger");
       exit;
     }
 
@@ -186,7 +197,7 @@ class Module extends CLI
     $module->save();
     $date = date('Y-m-d H:i:s');
     $this->print("[ON {$name} | {$date}]", "green");
-    $this->print("Módulo '{$name}' ativado com sucesso.", "green");
+    $this->alertLine("Módulo '{$name}' ativado com sucesso.", "success");
   }
 
   private function offModule($name)
@@ -264,7 +275,12 @@ class Module extends CLI
       // Obtém a lista de arquivos e diretórios no diretório
       $files = scandir($dir_path);
 
-      // Percorre a lista de arquivos e diretórios
+      if(count($files) <= 2)
+      {
+        $this->alertLine('Até o momento, não existem módulos a serem listados.','warning');
+        exit;
+      }
+
       foreach ($files as $file) {
         // Ignora os diretórios "." e ".."
         if ($file == '.' || $file == '..') {
@@ -272,7 +288,8 @@ class Module extends CLI
         }
 
         // Verifica se é um diretório
-        if (is_dir($dir_path . '/' . $file)) {
+        if (is_dir($dir_path . '/' . $file))
+        {
           $status = $this->checkModule($file);
           $style = $status ? "\033[32m" : "\033[31m";
           $msg = $status ? "\033[34m[OK]\033[0m" : "\033[31m[INVALID]\033[0m";

@@ -22,7 +22,7 @@ class Migration extends CLI
             $this->createTableMigrationForController();
         }
       } catch (\Exception $e) {
-          $this->print("Para realizar qualquer operação no banco de dados, é necessário configurar corretamente a conexão no arquivo .env, inserindo as informações de host, porta, nome do banco de dados, usuário e senha. Somente após as configurações corretas serem realizadas, será possível modificar as migrações com segurança. Certifique-se de preencher corretamente o arquivo .env antes de realizar qualquer alteração nas migrações.","red");
+          $this->alert("Para realizar qualquer operação no banco de dados, é necessário configurar corretamente a conexão no arquivo .env, inserindo as informações de host, porta, nome do banco de dados, usuário e senha. Somente após as configurações corretas serem realizadas, será possível modificar as migrações com segurança. Certifique-se de preencher corretamente o arquivo .env antes de realizar qualquer alteração nas migrações.","danger");
           exit;
       }
     }
@@ -55,8 +55,8 @@ class Migration extends CLI
                     $this->print("Já existe um arquivo de migração de nome \"{$name}\".","red");
                 }
             }else{
-               $this->print("Você deve informar um nome de migração e um nome de tabela(table) válidos!","red");
-               $this->print("php hello migration:create [nome_migration] table=[nome_tabela]","magenta"); 
+               $this->alertLine("Você deve informar um nome de migração e um nome de tabela(table) válidos!","warning");
+               $this->print("php hello migration:create [nome_migration] table=[nome_tabela]","yellow"); 
             }
 
             break;
@@ -158,7 +158,7 @@ class Migration extends CLI
                 $class = "App\\Migrations\\{$migration}";
                 call_user_func(array(new $class, 'executeDown'));
     
-                $this->print("[{$order}] - Método down() executado em: \"{$class}\".","red");
+                $this->alertLine("[{$order}] - Método down() executado em: \"{$class}\".","danger");
                 
             }
              if($order > 0)
@@ -166,17 +166,17 @@ class Migration extends CLI
                 if($reset)
                 {
                      DB::table($this->table)->delete();
-                     $this->print("A transação foi revertida com sucesso para o estado anterior, e todas as alterações feitas foram desfeitas.","green");
+                     $this->alertLine("A transação foi revertida com sucesso para o estado anterior, e todas as alterações feitas foram desfeitas.","success");
                 }else{
                     DB::table($this->table)->where('batch',$last)->delete();
-                    $this->print("A transação foi revertida com sucesso para o estado anterior, e todas as alterações feitas no último lote {$last} de {$order} registro(s) foram desfeita(s).","green");
+                    $this->alertLine("A transação foi revertida com sucesso para o estado anterior, e todas as alterações feitas no último lote {$last} de {$order} registro(s) foram desfeita(s).","success");
                 }
-                $this->print("Os registros afetados foram restaurados para o estado anterior à transação que os modificou.","green");
+                $this->alertLine("Os registros afetados foram restaurados para o estado anterior à transação que os modificou.","success");
              }else{
-                $this->print("Nenhum lote para ser executado.","red");
+                $this->alertLine("Nenhum lote para ser executado.","danger");
              }
         }else{
-            $this->print("Nenhum lote para ser executado.","red");
+            $this->alertLine("Nenhum lote para ser executado.","danger");
         }
 
     }
@@ -226,6 +226,8 @@ class Migration extends CLI
     /*Executa as migrações*/
     private function executeMigration()
     {
+
+        $this->confirm();
         $data = DB::table($this->table)->collection();
         $migrations = $data->pluck('migration');
         $batch = $data->max('batch') + 1;
@@ -242,14 +244,14 @@ class Migration extends CLI
 
             $this->registerMigration($migration,$batch);
 
-            $this->print("[{$order}] - Migração: \"{$class}\" executada com sucesso.","green");
+            $this->alertLine("[{$order}] - Migração: \"{$class}\" executada com sucesso.","success");
             $order++;
             $total++;
           }
         }
 
         $msg = $total > 0 ? "TOTAL de {$total} executada(s) com sucesso." : "Nenhuma migração foi executada.";
-        $this->print($msg, $total > 0 ? "green" : "red");
+        $this->alertLine($msg, $total > 0 ? "success" : "danger");
     }
 
 

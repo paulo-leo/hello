@@ -2,10 +2,11 @@
 
 namespace Kernel\Http;
 
+use Kernel\Http\Session;
 use App\Models\UserModel as User;
 use Kernel\Support\ObjectDefault;
 
-class Auth
+class Auth 
 {
    private static $name = 'user_login_array';
    private static $ignore = ['password'];
@@ -13,56 +14,45 @@ class Auth
       'password_invalid' => 'Senha incorreta'
    ];
 
+   private static $session;
+
+   private static function start()
+   {
+      if(!self::$session) self::$session = new Session;
+   }
+
    /*
        Verifica se uma sessão de usuário existe.
     */
    public static function login($data)
    {
+      self::start();
       $data = (object) $data;
       $login = User::filter(array(
          'email' => $data->email
       ))->collection()->first();
 
-      if ($login) {
-         if (secret($data->password) == $login->password) {
-            self::createSession((array) $login);
+      if ($login)
+      {
+         if (secret($data->password) == $login->password) 
+         {
+            $login = (array) $login;
+            $login['ip'] = get_ip();
+            $login['login_at'] = date('Y-m-d H:m:s');
+            self::$session->put(self::$name, $login);
          }
       }
    }
 
-   /*
-       Inicia uma sessão
-    */
-   private static function initSession()
-   {
-      if (!isset($_SESSION)) {
-         session_start();
-      }
-   }
-
-   /*
-       Cria uma sessão de usuário.
-    */
-   private static function createSession($data)
-   {
-      self::initSession();
-      $_SESSION[self::$name] = array();
-
-      $data['login_at'] = date('Y-m-d H:m:s');
-      foreach ($data as $name => $value) {
-         if (!in_array($name, self::$ignore)) $_SESSION[self::$name][$name] = $value;
-      }
-   }
 
    /*
        Verifica se uma sessão de usuário existe.
     */
    public static function check()
    {
-      self::initSession();
-      if (isset($_SESSION[self::$name]))
-         return $_SESSION[self::$name];
-      else return false;
+     self::start();
+     return self::$session->has(self::$name) 
+     ? self::$session->get(self::$name) : false;
    }
 
    /*
@@ -70,11 +60,8 @@ class Auth
     */
    public static function destroy()
    {
-      self::initSession();
-      if (isset($_SESSION[self::$name])) {
-         unset($_SESSION[self::$name]);
-         return true;
-      } else return false;
+      self::start();
+      self::$session->remove(self::$name);
    }
 
    /*

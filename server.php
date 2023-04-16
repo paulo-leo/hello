@@ -128,6 +128,13 @@ function get_ip() {
    return $ipv4_address ? $ipv4_address : $ip_address;
 }
 
+function redirect($url)
+{
+  $url = url($url);
+  header("Location: {$url}");
+  exit;
+}
+
 
 
 function dir_delete($dir) {
