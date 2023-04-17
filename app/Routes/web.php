@@ -17,21 +17,41 @@ Route::get('*',function(){
 });
 
 
-Route::get('teste/{id}',function(UserRequest $request){
+Route::get('file',function(){
 
-     return $request->fails() ? $request->errors() : $request->validated(); 
+    $url = url('file');
+    $token = csrf_token();
 
+    return "<form method='POST' enctype='multipart/form-data' action='{$url}'>
+         <input type='hidden' name='_token' value='{$token}'>
+          <input type='file'  name='arquivo' multiple>
+          <input type='submit' value='Enviar'>
+      </form>";
+
+});
+
+
+Route::post('file',function(Kernel\Http\Request $request){
+
+
+    $request->validate(['arquivo'=>'file|size:900000|extension:png']);
+
+    $request->set('arquivo','xxxxxxxxx');
+
+    if($request->success()) return $request->validated();
+    else return $request->errors();
+    
 });
 
 Route::get('teste1',function(){
      /*
     return Auth::register([
         'name'=>'Paulo Leonardo',
-        'email'=>'pauloleonardo.rio@gmail.com',
+        'email'=>'xxxx.rixxxo@gmail.com',
         'password'=>'123456'
      ]);
      */
-    //Auth::login(['email'=>'pauloleonardo.rio@gmail.com','password'=>'123456']);
+    //Auth::login(['email'=>'xxxx.rixxxo@gmail.com','password'=>'123456']);
 
     
     if(Auth::check()) redirect('teste/10');

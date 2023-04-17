@@ -3,13 +3,13 @@
 namespace Kernel\Http;
 
 use Kernel\FS\ReadArray;
+use Kernel\Http\FileRequest;
 use Kernel\Http\RuleRequest;
 
-class Request
+class Request extends FileRequest
 {
     private $all;
     private $check;
-    private $files;
     private $errors;
     private $_validations = array();
     private $validated = array();
@@ -20,13 +20,11 @@ class Request
 
     public function __construct()
     {
-
+        parent::__construct();
         $this->check = 1;
         $this->patterns = RuleRequest::patterns();
         $this->all = $this->parseInput();
-        $this->files = $this->parseFiles();
         $this->headers = $this->parseHeaders();
-
     }
 
     private function getPattern($pattern, $argument = null)
@@ -54,11 +52,6 @@ class Request
         }
     }
 
-    private function parseFiles(): array
-    {
-        return $_FILES ?? [];
-    }
-
     private function parseHeaders(): array
     {
         $headers = [];
@@ -73,7 +66,7 @@ class Request
         return $this->headers[$key] ?? null;
     }
 
-    public function headers()
+    public function getHeaderAll()
     {
         return $this->headers;
     }
@@ -169,11 +162,43 @@ class Request
                   $this->error_keys[$key_v] = $key_v;
                   $this->check *= 0;
             }
+
+            if($key == 'file')
+            {
+              if(!$this->hasFile($name))
+              {
+                $key_v = "{$name}.{$key}";
+                $this->error_keys[$key_v] = $key_v;
+                $this->check *= 0; 
+              }   
+            }
+
+            if($key == 'size')
+            {
+              if($this->fileSize($name) > ((int) $argument))
+              {
+                $key_v = "{$name}.{$key}";
+                $this->error_keys[$key_v] = $key_v;
+                $this->check *= 0; 
+              }   
+            }
+            //fileExtension($name,$one=true)
+            if($key == 'extension')
+            {
+              $extension = $this->fileExtension($name);
+              $argument = explode(',',$argument);
+              if(!$this->fileCheckExtension($extension,$argument))
+              {
+                $key_v = "{$name}.{$key}";
+                $this->error_keys[$key_v] = $key_v;
+                $this->check *= 0; 
+              }   
+            }
          }
         }
     }
 
-    public function check()
+    private function check()
     {
         foreach ($this->all() as $key => $value)
         {

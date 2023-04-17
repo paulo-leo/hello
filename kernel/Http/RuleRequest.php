@@ -52,7 +52,10 @@ class RuleRequest extends Request
    );
 
    private static $messages_defaults = array(
-    'required'=>'O campo "{name}" é obrigatório.'
+    'required'=>'O campo "{name}" é obrigatório.',
+    'file'=>'Você deve fazer o upload de arquivo para o campo "{name}".',
+    'size'=>'O tamanho de arquivo é muito grande.',
+    'extension'=>'Extensão de arquivo não permitido para upload.'
    );
 
    final public static function patterns()
