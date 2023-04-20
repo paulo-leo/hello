@@ -33,7 +33,7 @@ class Path
 		return $index;
 	}
 
-	private static function uri()
+	public static function uri()
 	{
 		return $_GET['uri'];
 	}

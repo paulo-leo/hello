@@ -48,11 +48,18 @@ class Auth
    /*
        Verifica se uma sessão de usuário existe.
     */
-   public static function check()
+   public static function check($role=null)
    {
      self::start();
-     return self::$session->has(self::$name) 
-     ? self::$session->get(self::$name) : false;
+     $check = self::$session->has(self::$name) 
+     ? self::$session->get(self::$name) :false;
+
+     if($role && $check)
+     {
+       $check = ($check['role'] == $role) ?  $check : false;
+     }
+
+     return $check ? (object) $check : false;
    }
 
    /*
@@ -69,12 +76,8 @@ class Auth
     */
    public static function user()
    {
-      $auth = self::check();
-      $check = $auth ? true : false;
-      $auth = $check ? $auth : array();
-      $auth['check'] = $check;
-      $auth['all'] = (array) $auth;
-      $auth = new ObjectDefault($auth);
+      self::start();
+      $auth = new ObjectDefault(self::$session->get(self::$name) ?? []);
       return $auth;
    }
 

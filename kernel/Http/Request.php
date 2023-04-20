@@ -2,9 +2,11 @@
 
 namespace Kernel\Http;
 
+use Kernel\Http\URI;
 use Kernel\FS\ReadArray;
 use Kernel\Http\FileRequest;
 use Kernel\Http\RuleRequest;
+use Kernel\Http\Path;
 
 class Request extends FileRequest
 {
@@ -116,6 +118,29 @@ class Request extends FileRequest
         }
 
         $this->errors = $messages;
+    }
+
+    public function except($excepts,$data=null)
+    {
+          $data = is_null($data) ? $this->all() : $data;
+          foreach($excepts as $except)
+          {
+             if(isset($data[$except])) 
+                    unset($data[$except]);
+          }
+          return $data;
+    }
+
+    public function only($onlys,$data=null)
+    {
+          $data = is_null($data) ? $this->all() : $data;
+          $new_data = array();
+          foreach($onlys as $only)
+          {
+             if(isset($data[$only]))
+                  $new_data[$only] = $data[$only];
+          }
+          return $new_data;
     }
 
     private function checkInValue($key, $value)
@@ -241,7 +266,7 @@ class Request extends FileRequest
         return !$this->fails();
     }
 
-    public function validated()
+    public function validated($excepts=array())
     {
         $validated = array();
         if ($this->success()) {
@@ -249,6 +274,22 @@ class Request extends FileRequest
                 $validated[$key] = $this->get($key);
             }
         }
-        return $validated;
+        return $this->except($excepts,$validated);
     }
+
+    public function path()
+    {
+        return Path::uri();
+    }
+
+    public function query()
+    {
+        
+    }
+
+    public function isMethod($method)
+    {
+        return ($_SERVER['REQUEST_METHOD'] === strtoupper($method));
+    }
+
 }

@@ -125,6 +125,7 @@ class DB
   {
     return $this->connect()->query($sql,PDO::FETCH_ASSOC)->fetchAll();
   }
+
   private function connect()
   {
     return Connection::getConn($this->connection);
@@ -132,9 +133,10 @@ class DB
   /*
     Faz a construção de uma query
   */
-  public static function query()
+  public static function query($sql=null)
   {
      $db = new DB;
+     if($sql) $db->fetch($sql);
      return $db;
   }
 
@@ -151,19 +153,16 @@ class DB
 
   public function find($id)
   { 
-     if(is_array($id))
-     {
-       $f = array();
-       foreach($id as $k=>$v)
-       {
+      $id = !is_array($id) ? [$this->primaryKey=>$id] : $id;
+      $f = array();
+      foreach($id as $k=>$v)
+      {
          $f[] = array($k,$v);
        }
-       $this->where($f);
-     }else $this->where($this->primaryKey,$id);
-
-     $object = $this->collection()->first();
-     $object = new ObjectDefault((array) $object,$this);
-     return $object;
+      $this->where($f);
+      $object = $this->collection()->first();
+      $object = new ObjectDefault((array) $object,$this);
+      return $object;
   }
 
   private function checkFillable($data)
@@ -246,6 +245,13 @@ class DB
   {
      $db = new DB($connection);
      $db->setTable($table);
+     return $db;
+  }
+
+  public static function connection($connection,$table=null)
+  {
+     $db = new DB($connection);
+     if($table) $db->setTable($table);
      return $db;
   }
 
