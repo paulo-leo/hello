@@ -5,10 +5,11 @@ namespace Kernel\Http;
 use Kernel\Http\Session;
 use App\Models\UserModel as User;
 use Kernel\Support\ObjectDefault;
+use Exception;
 
 class Auth 
 {
-   private static $name = 'user_login_array';
+   private static $name = 'user';
    private static $ignore = ['password'];
    private static $messages = [
       'password_invalid' => 'Senha incorreta'
@@ -24,24 +25,38 @@ class Auth
    /*
        Verifica se uma sessão de usuário existe.
     */
-   public static function login($data)
+   public static function login($data,$success=null)
    {
       self::start();
       $data = (object) $data;
-      $login = User::filter(array(
+      
+      $login = User::find(array(
          'email' => $data->email
-      ))->collection()->first();
+      ));
 
-      if ($login)
+      if ($login->email)
       {
          if (secret($data->password) == $login->password) 
          {
             $login = (array) $login;
             $login['ip'] = get_ip();
             $login['login_at'] = date('Y-m-d H:m:s');
+
+
             self::$session->put(self::$name, $login);
+             
+            /*Executa uma função anônima no caso de sucesso, caso seja informado no segundo parâmetro.*/
+            if(is_callable($success))
+            {
+               $success();
+            }
+
+         }else{
+           throw new Exception('A senha informada é inválida.',100);
          }
-      }
+      }else{
+         throw new Exception('Usuário não encontrado pelo endereço de e-mail informado.',200);
+      } 
    }
 
 
@@ -86,21 +101,26 @@ class Auth
     */
    public static function register($data)
    {
+      $user = new User; 
       $password = secret($data['password']);
       $name = trim($data['name']);
       $email = $data['email'];
 
-      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return false;
-      if (strlen($name) < 2) return false;
-      if (!$password) return false;
+      if (!filter_var($email, FILTER_VALIDATE_EMAIL)) 
+         throw new Exception("O endereço de e-mail informado é inválido.",100);
 
-      $user = new User;
+      if (strlen($name) < 2) 
+         throw new Exception("O nome não pode ter menos de dois caracteres.",200);
 
-      if ($user->where('email', $email)->count() > 0) return false;
+      if (!$password) 
+         throw new Exception("A senha não atende ao padrão requerido.",300);
+
+      if ($user->where('email', $email)->count() > 0) 
+         throw new Exception("O endereço de e-mail informado já está em uso.",400);
 
       $data['name'] = $name;
       $data['password'] = $password;
 
-      return $user->create($data);
+      return $user->insertGetId($data);
    }
 }

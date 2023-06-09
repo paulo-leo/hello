@@ -2,12 +2,14 @@
 namespace App\Middlewares;
 
 use Kernel\Http\Middleware;
+use Kernel\Http\Auth as Login;
+
 
 class Auth extends Middleware
 {
    public function handle($method,$route)
    {
-      return false;
+      if(Login::check()) return true;
    }
 
    public function message()

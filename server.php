@@ -14,6 +14,8 @@ Vars::set('Request', Vars::get('Request')->all());
 Vars::set('RouteStorage', new Kernel\Router\RouteStorage);
 Vars::set('ServiceProvider', new Kernel\Http\ServiceProvider);
 Vars::set('Session', new Kernel\Http\Session);
+Vars::set('Auth', new Kernel\Http\Auth);
+
 
 
 function session(array $sessions = [])
@@ -128,6 +130,7 @@ function get_ip() {
    return $ipv4_address ? $ipv4_address : $ip_address;
 }
 
+/*Redireciona o usuário para uma rota especifica*/
 function redirect($url)
 {
   $url = url($url);
@@ -161,31 +164,36 @@ function dir_delete($dir) {
 
 function dump($value = null)
 {
-  $style = "background-color:black;color:white;font-family:arial;padding:20px;border-radius:20px";
-  echo "<div style='{$style}'>
-   [";
-  if (gettype($value) == 'array' || gettype($value) == 'object') {
-    $value = (array) $value;
-    echo "[ array(<br>";
-    foreach ($value as $key => $val) {
-      echo "{$key} = ";
-      if (gettype($val) != 'array' || gettype($val) != 'object') {
-        echoValueType($val);
-      } else {
-        dump($val);
-      }
+    $style = "background-color:black;color:white;font-family:arial;padding:20px;border-radius:20px";
+    echo "<div style='{$style}'>[";
+    
+    if (is_array($value) || is_object($value)) {
+        $value = (array) $value;
+        echo "<br>array(<br>";
+        
+        foreach ($value as $key => $val) {
+            echo "{$key} = ";
+            
+            if (!is_array($val) && !is_object($val)) {
+                echoValueType($val);
+            } else {
+                dump($val);
+            }
+        }
+        
+        echo ")";
+    } else {
+        echoValueType($value);
     }
-    echo ")";
-  } else {
-    echoValueType($value);
-  }
-  echo "]</div>";
+    
+    echo "]</div>";
 }
+
 
 function echoValueType($value)
 {
   $type = gettype($value);
-  echo "<p style='color:blue'><b style='color:green'>{$type}</b> : {$value}</p>";
+  echo "<span style='color:blue'><b style='color:green'>{$type}</b> : {$value}</span>|";
 }
 
 if (!function_exists('getallheaders')) {

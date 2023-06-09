@@ -37,7 +37,18 @@ class Session
     {
         $this->start();
         $this->createArray();
-        return $_SESSION[$this->name][$name] ?? null;
+
+        
+        if(substr($name,0,5) == 'user.')
+        {
+             $name = str_replace('user.','',$name);
+             $key = $_SESSION[$this->name]['user'] ?? null;
+             return (array) $key;
+        }else{
+            return $_SESSION[$this->name][$name] ?? null;
+        }
+
+        
     }
 
     public function pull(string $name): mixed

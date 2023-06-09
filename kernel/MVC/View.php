@@ -148,6 +148,7 @@ class View
    public function transform($content)
    {
       $content = $this->section($content);
+      $content = $this->viewTokenCSRF($content);
       $content = $this->show($content);
       $content = $this->componet($content);
       $content = $this->viewPHP($content);
@@ -174,6 +175,16 @@ class View
       $file = str_replace(['<php>', '</php>'], ['<?php', '?>'], $file);
       $file = str_replace(['<vh>', '</vh>'], ['<?php', '?>'], $file);
       $file = str_replace(['{vh}', '{/vh}'], ['<?php', '?>'], $file);
+      return $file;
+   }
+
+   /*Token CSRF e field*/
+   public function viewTokenCSRF($file)
+   {
+      $token = csrf_token();
+      $input = '<input type="hidden" name="_token" value="'.$token.'">';
+      $file = str_replace('{{csrf_token}}',$token, $file);
+      $file = str_replace('{{csrf_field}}',$input, $file);
       return $file;
    }
 

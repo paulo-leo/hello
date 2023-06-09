@@ -451,6 +451,21 @@ class Model
       ->create($data);
    }
 
+   public static function insertGetId($data,$all=false)
+   {
+      $model = self::classStatic();
+      $model->getData();
+      return DB::table($model->table,$model->connection)
+      ->setUseFillable(true)
+      ->setFillable($model->fillable)
+      ->setPrimaryKey($model->primaryKey)
+      ->setTrash($model->trash)
+      ->setTimestamps($model->timestamps)
+      ->setAttributes($model->attributes)
+      ->setNamespace(get_called_class())
+      ->insertGetId($data,$all);
+   }
+
    public static function with($with)
    {
       $model = self::classStatic();

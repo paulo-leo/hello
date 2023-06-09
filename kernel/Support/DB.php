@@ -154,14 +154,8 @@ class DB
   public function find($id)
   { 
       $id = !is_array($id) ? [$this->primaryKey=>$id] : $id;
-      $f = array();
-      foreach($id as $k=>$v)
-      {
-         $f[] = array($k,$v);
-       }
-      $this->where($f);
-      $object = $this->collection()->first();
-      $object = new ObjectDefault((array) $object,$this);
+      $id = $this->filter($id)->get()[0] ?? array();
+      $object = new ObjectDefault((array) $id);
       return $object;
   }
 
@@ -226,6 +220,7 @@ class DB
     return $this->connect()->exec($sql);
   }
 
+   /*Inseri um registo no banco de dados por meio do método "create"*/
   public function insert($data)
   {
     $check = implode('',array_keys($data));
@@ -240,6 +235,20 @@ class DB
    }
    return $total;
   }
+
+   /*Inseri um registo no banco de dados por meio do método "create"*/
+   public function insertGetId($data,$all=false)
+   {
+       $id = 0;
+       if($this->create($data))
+       {
+         $get = (array) $this->filter($data)
+         ->orderBy($this->primaryKey,'DESC')
+         ->get()[0] ?? $id;
+         if($get > 0) $id = !$all ? $get[$this->primaryKey] : $get;
+       }
+       return $id;
+   }
 
   public static function table($table,$connection=null)
   {
@@ -568,6 +577,7 @@ class DB
        $type = is_null($type) ? 'ASC' : $type;
        $cols = is_array($cols) ? implode(',',$cols) : $cols;
        $this->order_by = "ORDER BY {$cols} {$type}";
+       return $this;
    }
 
    public function groupBy($cols)
@@ -718,13 +728,6 @@ class DB
          $this->selects[] = "{$prefix}{$columns[$i]}";
       }
       return $this;
-   }
-
-
-
-   public function insertGetId()
-   {
-
    }
 
    public function with($calls)

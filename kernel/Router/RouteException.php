@@ -41,7 +41,7 @@ class RouteException
                             <p class='border-bottom'>Arquivo: <strong>{$this->e->getFile()}</strong></p> 
                             <p class='border-bottom'>Código: <code>{$this->e->getCode()}</code></p>
                             <p class='border-bottom'>Linha: <strong>{$this->e->getLine()}</strong></p>
-                            <p class='border-bottom'>Ratreamento: <code>{$this->e->getTraceAsString()}</code></p>
+                            <p class='border-bottom'>Rateamento: <code>{$this->e->getTraceAsString()}</code></p>
                         </div>
                     </div>
                 </div>
