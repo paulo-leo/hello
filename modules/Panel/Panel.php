@@ -6,6 +6,7 @@ use Kernel\Http\Auth;
 use Kernel\Router\Route;
 use Kernel\Http\Request;
 use Kernel\Support\Module;
+use App\Models\UserModel as User;
 
 
 class Panel extends Module
@@ -39,9 +40,7 @@ class Panel extends Module
         
       Route::get('panel',function(){
 
-        //return view('@panel.pages.index');
-  
-        return session()->get('user.name');
+        return view('@panel.pages.index');
 
       })->middleware('auth');
 

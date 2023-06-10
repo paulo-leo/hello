@@ -9,11 +9,12 @@ class Auth extends Middleware
 {
    public function handle($method,$route)
    {
+
       if(Login::check()) return true;
    }
 
    public function message()
    {
-      return 'Filtro não localizado';
+      return 'Para ter acesso a este conteúdo, é necessário se autenticar.';
    }
 }

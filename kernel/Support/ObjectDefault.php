@@ -14,6 +14,16 @@ class ObjectDefault
       if(count($data) > 0) $this->data = $data;
       $this->ref = $ref;
    }
+
+   public function all()
+   {
+      return $this->data;
+   }
+
+   public function get($name)
+   {
+      return $this->data[$name] ?? false;
+   }
     
    public function __set($name, $value)
    {

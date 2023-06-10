@@ -25,74 +25,61 @@ class Session
             $_SESSION[$this->name] = [];
         }
     }
-
+    
+    /*Salva a chave e valor de uma sessão*/
     public function put(string $name, mixed $value): void
     {
         $this->start();
-        $this->createArray();
-        $_SESSION[$this->name][$name] = $value;
+        $_SESSION[$name] = $value;
     }
-
+     
+    /*Recupera o valor de uma sessão especifica*/
     public function get(string $name): mixed
     {
         $this->start();
-        $this->createArray();
-
-        
-        if(substr($name,0,5) == 'user.')
-        {
-             $name = str_replace('user.','',$name);
-             $key = $_SESSION[$this->name]['user'] ?? null;
-             return (array) $key;
-        }else{
-            return $_SESSION[$this->name][$name] ?? null;
-        }
-
-        
+        return $_SESSION[$name] ?? null;
     }
 
     public function pull(string $name): mixed
     {
         $this->start();
-        $this->createArray();
-        $value = $_SESSION[$this->name][$name] ?? null;
+        $value = $_SESSION[$name] ?? null;
         $this->remove($name);
         return $value;
     }
-
+    /*Retorna um array com todas as sessões*/ 
     public function all(): array
     {
         $this->start();
-        $this->createArray();
-        return $_SESSION[$this->name];
+        return $_SESSION;
     }
-
+    /*Verifica se uma chave de sessão existe*/
     public function exists(string $name): bool
     {
         $this->start();
-        $this->createArray();
-        return isset($_SESSION[$this->name][$name]);
+        return isset($_SESSION[$name]);
     }
-
+    /*Alias para o método "exists"*/
     public function has(string $name): bool
     {
         return $this->exists($name);
     }
 
+    /*Verifica se uma key de sessão não existe*/
     public function missing(string $name): bool
     {
         $this->start();
-        $this->createArray();
-        return !isset($_SESSION[$this->name][$name]);
+        return !isset($_SESSION[$name]);
     }
-
+     /*Remove a chave de uma sessão especifica*/
     public function remove(string $name): void
     {
-        if ($this->exists($name)) {
-            unset($_SESSION[$this->name][$name]);
+        if ($this->exists($name))
+        {
+            unset($_SESSION[$name]);
         }
     }
-
+    /*Elimina todas as sessões*/
     public function destroy(): void
     {
         $this->start();

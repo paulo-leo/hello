@@ -6,6 +6,7 @@ use Kernel\Router\RouteCallback;
 use Kernel\MVC\View;
 use Kernel\Http\Path;
 use Kernel\Support\Hello;
+use Kernel\Http\Auth;
 
 Vars::set('DotEnv', new DotEnv(__DIR__ . '/.env'));
 Vars::set('URI', new Kernel\Http\URI);
@@ -14,9 +15,6 @@ Vars::set('Request', Vars::get('Request')->all());
 Vars::set('RouteStorage', new Kernel\Router\RouteStorage);
 Vars::set('ServiceProvider', new Kernel\Http\ServiceProvider);
 Vars::set('Session', new Kernel\Http\Session);
-Vars::set('Auth', new Kernel\Http\Auth);
-
-
 
 function session(array $sessions = [])
 {
@@ -29,6 +27,11 @@ function session(array $sessions = [])
     }
   }
   return $session; 
+}
+
+function auth($role=null)
+{
+  return Auth::check($role);
 }
 
 function build($params)
@@ -97,7 +100,6 @@ function route($name, $params = [])
   $route = Vars::get('RouteStorage')->getRouteByName($name, $params);
   return $route ? url($route) : null;
 }
-
 
 function path($name)
 {

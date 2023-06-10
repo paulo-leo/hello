@@ -9,12 +9,6 @@ use Exception;
 
 class Auth 
 {
-   private static $name = 'user';
-   private static $ignore = ['password'];
-   private static $messages = [
-      'password_invalid' => 'Senha incorreta'
-   ];
-
    private static $session;
 
    private static function start()
@@ -30,21 +24,24 @@ class Auth
       self::start();
       $data = (object) $data;
       
-      $login = User::find(array(
-         'email' => $data->email
-      ));
-
-      if ($login->email)
+      $login = User::find(['email' => $data->email]);
+     
+      if ($login->get('email'))
       {
-         if (secret($data->password) == $login->password) 
+         if (secret($data->password) == $login->get('password')) 
          {
-            $login = (array) $login;
+            $login = $login->all();
+
+            $first = explode(' ', $login['name']);
+            $login['first_name'] = $first[0];
             $login['ip'] = get_ip();
             $login['login_at'] = date('Y-m-d H:m:s');
 
+            foreach($login as $name=>$value)
+            {
+               self::$session->put($name, $value);
+            }
 
-            self::$session->put(self::$name, $login);
-             
             /*Executa uma função anônima no caso de sucesso, caso seja informado no segundo parâmetro.*/
             if(is_callable($success))
             {
@@ -66,8 +63,13 @@ class Auth
    public static function check($role=null)
    {
      self::start();
-     $check = self::$session->has(self::$name) 
-     ? self::$session->get(self::$name) :false;
+
+     $_email = self::$session->has('email');
+     $_name = self::$session->has('name');
+     $_role = self::$session->has('role');
+
+     $check = ($_email && $_name && $_role) 
+     ? self::$session->all() :false;
 
      if($role && $check)
      {
@@ -83,7 +85,10 @@ class Auth
    public static function destroy()
    {
       self::start();
-      self::$session->remove(self::$name);
+      foreach(self::$session->all() as $key=>$val)
+      {
+         if($key != 'np_csrf_token') self::$session->remove($key);
+      }
    }
 
    /*
@@ -92,7 +97,7 @@ class Auth
    public static function user()
    {
       self::start();
-      $auth = new ObjectDefault(self::$session->get(self::$name) ?? []);
+      $auth = new ObjectDefault(self::$session->all() ?? []);
       return $auth;
    }
 

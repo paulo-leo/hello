@@ -7,12 +7,13 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Features</a>
-        </li>
+
+        {if auth('admin')}
+         <li class="nav-item">
+           <a class="nav-link" href="#">Criar usuário</a>
+         </li>
+        {/if}
+
         <li class="nav-item">
           <a class="nav-link" href="#">Pricing</a>
         </li>
@@ -21,13 +22,12 @@
        
       <div class="btn-group">
   <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-    Opções
+      {{session()->get('first_name')}}
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item" type="button">{{session()->get('name')}}</button></li>
-    <li><button class="dropdown-item" type="button">Another action</button></li>
+    <li><button class="dropdown-item" type="button">Editar perfil</button></li>
     <li><hr class="dropdown-divider"></li>
-    <li><button class="dropdown-item text-danger" type="button">Encerra sessão</button></li>
+    <li><a href="{{url('logout')}}" class="dropdown-item text-danger">Encerra sessão</a></li>
   </ul>
 </div>
 
