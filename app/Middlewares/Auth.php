@@ -9,7 +9,6 @@ class Auth extends Middleware
 {
    public function handle($method,$route)
    {
-
       if(Login::check()) return true;
    }
 

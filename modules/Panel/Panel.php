@@ -37,13 +37,9 @@ class Panel extends Module
              return redirect('login');
         });
         
-        
-      Route::get('panel',function(){
-
-        return view('@panel.pages.index');
-
-      })->middleware('auth');
-
+      /*Página inicial do painel admistrativo*/ 
+      Route::get('panel',fn() => view('@panel.pages.index'))
+      ->middleware('auth');
 
     }
 

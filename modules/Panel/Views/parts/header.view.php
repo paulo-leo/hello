@@ -1,5 +1,5 @@
 <header>
-<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light shadow">
+<nav class="navbar fixed-top navbar-expand-lg navbar-light bg-white shadow" style="padding:0px">
   <div class="container-fluid">
     <a class="navbar-brand" href="{{url('panel')}}">{{env('APP_NAME','Panel')}}</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
@@ -9,14 +9,14 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
         {if auth('admin')}
-         <li class="nav-item">
-           <a class="nav-link" href="#">Criar usuário</a>
-         </li>
+           <li class="nav-item">
+              <a class="nav-link" href="#">Listar usuários</a>
+           </li>
+           <li class="nav-item">
+             <a class="nav-link" href="#">Adicionar usuário</a>
+           </li>
         {/if}
 
-        <li class="nav-item">
-          <a class="nav-link" href="#">Pricing</a>
-        </li>
       </ul>
       <span class="navbar-text">
        

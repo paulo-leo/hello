@@ -17,14 +17,7 @@ Route::get('*',function(){
 });
 
 Route::get('teste',function(){ 
-
-        $data = [
-            'name'=>'Paulo Leonardo',
-            'email'=>'pauloleonardo.rio@gmail.com',
-            'password'=>'123456'
-        ];
-
       
-      
-     
+    $x = 100;
+    dump($x);
 });

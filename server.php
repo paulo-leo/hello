@@ -140,9 +140,8 @@ function redirect($url)
   exit;
 }
 
-
-
-function dir_delete($dir) {
+function dir_delete($dir) 
+{
   if (!file_exists($dir)) {
       return true;
   }
@@ -164,33 +163,41 @@ function dir_delete($dir) {
   return rmdir($dir);
 }
 
-function dump($value = null)
+function dump(...$vars)
 {
-    $style = "background-color:black;color:white;font-family:arial;padding:20px;border-radius:20px";
-    echo "<div style='{$style}'>[";
-    
-    if (is_array($value) || is_object($value)) {
-        $value = (array) $value;
-        echo "<br>array(<br>";
-        
-        foreach ($value as $key => $val) {
-            echo "{$key} = ";
-            
-            if (!is_array($val) && !is_object($val)) {
-                echoValueType($val);
-            } else {
-                dump($val);
-            }
-        }
-        
-        echo ")";
-    } else {
-        echoValueType($value);
+    $styles = [
+        'string' => 'color: #006400;', // verde escuro
+        'integer' => 'color: #0000FF;', // azul
+        'float' => 'color: #8A2BE2;', // roxo
+        'boolean' => 'color: #DC143C;', // vermelho escuro
+        'array' => 'color: #FF8C00;', // laranja escuro
+        'object' => 'color: #FF00FF;', // magenta
+        'NULL' => 'color: #A9A9A9;', // cinza
+    ];
+
+    echo '<pre>';
+    foreach ($vars as $var)
+    {
+        $type = gettype($var);
+        $style = isset($styles[$type]) ? $styles[$type] : '';
+        echo '<span style="' . $style . '">';
+           var_dump($var);
+        echo '</span>';
     }
-    
-    echo "]</div>";
+    echo '</pre>';
+    die;
 }
 
+function dd(...$variables)
+{
+    echo "<pre>";
+    foreach ($variables as $variable)
+    {
+        var_dump($variable);
+    }
+    echo "</pre>";
+    die;
+}
 
 function echoValueType($value)
 {

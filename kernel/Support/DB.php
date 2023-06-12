@@ -794,9 +794,6 @@ class DB
     );
    }
 
-
-
-
    private function joins($table,$column,$op,$column2,$type)
    {
       if(is_null($column2))

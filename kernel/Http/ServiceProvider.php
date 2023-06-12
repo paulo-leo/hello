@@ -14,9 +14,9 @@ class ServiceProvider
     private static $messages = array();
     private static $services = array();
 
-    protected function register($name, $value = null)
+    protected function register($name, $class = null)
     {
-        $class = is_null($value) ? get_class($this) : $value;
+        $class = is_null($class) ? get_class($this) : $class;
         self::$services[$name] = new $class;
     }
 
