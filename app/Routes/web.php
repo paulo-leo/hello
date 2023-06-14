@@ -18,6 +18,6 @@ Route::get('*',function(){
 
 Route::get('teste',function(){ 
       
-    $x = 100;
-    dump($x);
+    return view('teste');
+
 });

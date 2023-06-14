@@ -40,17 +40,31 @@ class View
    }
 
    /*Recupera uma sessão div*/
-   private function getSection($name)
+   private function getSection($name,$vars=null)
    {
-      $print = $this->sections[$name] ?? '';
-      return $print;
+      $vars = is_array($vars) ? $vars : 
+      array('scope'=>$vars);
+
+      $scope = array();
+      foreach($vars as $key=>$val)
+      {
+         $scope['@'.$key] = $val;
+      }
+
+      $section = $this->sections[$name] ?? '';
+      $section = strtr($section, $scope);
+
+      return $section;
    }
 
    /*Estrutura para exibir uma sessão*/
    private function show($file)
    {
-      $x = "/{show {$this->all}\|?}/imU";
-      $file = preg_replace($x, '<?php echo \$this->getSection($1); ?>', $file);
+      //$x = "/{show {$this->all}\|?}/imU";
+
+      $x = "/{show {$this->all}(?:\|{$this->all})?}/imU";
+
+      $file = preg_replace($x, '<?php echo \$this->getSection($1,$2); ?>', $file);
       return $file;
    }
 
@@ -58,6 +72,7 @@ class View
    private function section($file)
    {
       $x = "/{section {$this->all}}/imU";
+
       $file = preg_replace($x, '<?php \$this->sectionSave($1,"', $file);
       $file = str_replace('{/section}', '"); ?>', $file);
       return $file;
@@ -150,7 +165,6 @@ class View
       $content = $this->section($content);
       $content = $this->viewTokenCSRF($content);
       $content = $this->show($content);
-      $content = $this->componet($content);
       $content = $this->viewPHP($content);
       $content = $this->viewIf($content);
       $content = $this->viewVH($content);
@@ -160,13 +174,6 @@ class View
       return $content;
    }
 
-   /*Estrutura de componente*/
-   public function componet($file)
-   {
-      $x = "/{x\-{$this->all} {$this->all}}/imU";
-      $file = preg_replace($x, "<?php echo \$$1->render($2); ?>", $file);
-      return $file;
-   }
 
    /*Estrutura para código PHP bruto*/
    public function viewPHP($file)
@@ -215,12 +222,6 @@ class View
    /*Estrutura de inclusão*/
    private function viewVH($file)
    {
-      $cdnjs = "/{cdn\.js {$this->all}}/simU";
-      $file = preg_replace($cdnjs, "<?php echo \$this->importCDN('js',$1); ?>", $file);
-
-      $cdncss = "/{cdn\.css {$this->all}}/simU";
-      $file = preg_replace($cdncss, "<?php echo \$this->importCDN('css',$1); ?>", $file);
-
       $include = "/{include {$this->all}}/simU";
       $file = preg_replace($include, "<?php \$this->create($1,\$this->scope); ?>", $file);
 
