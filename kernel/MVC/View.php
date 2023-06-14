@@ -222,8 +222,10 @@ class View
    /*Estrutura de inclusão*/
    private function viewVH($file)
    {
-      $include = "/{include {$this->all}}/simU";
-      $file = preg_replace($include, "<?php \$this->create($1,\$this->scope); ?>", $file);
+      //$include = "/{include {$this->all}}/simU";
+      $include = "/{include {$this->all}(?:,(\s*'[^']*'))?}/simU";
+
+      $file = preg_replace($include, "<?php \$this->create($1,$2); ?>", $file);
 
       $includex = "/{json {$this->all}}/simU";
       $file = preg_replace($includex, "<?php echo json_encode($1); ?>", $file);

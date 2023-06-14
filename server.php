@@ -16,6 +16,31 @@ Vars::set('RouteStorage', new Kernel\Router\RouteStorage);
 Vars::set('ServiceProvider', new Kernel\Http\ServiceProvider);
 Vars::set('Session', new Kernel\Http\Session);
 
+function base_path()
+{
+    return __DIR__;
+}
+function public_path()
+{
+    return base_path().DIRECTORY_SEPARATOR.'public';
+}
+
+function storage_path()
+{
+    return base_path().DIRECTORY_SEPARATOR.'storage';
+}
+
+function config_path()
+{
+  return base_path().DIRECTORY_SEPARATOR.'config';
+}
+
+function resource_path()
+{
+  return base_path().DIRECTORY_SEPARATOR.'resources';
+}
+
+
 function session(array $sessions = [])
 {
   $session = Vars::get('Session');
@@ -32,21 +57,6 @@ function session(array $sessions = [])
 function auth($role=null)
 {
   return Auth::check($role);
-}
-
-function build($params)
-{
-  $params = !is_array($params) ? [$params] : $params;
-  $arr = [];
-  foreach ($params as $value1) {
-    $value1 = explode(' as ', $value1);
-    $class =  trim($value1[0]);
-    $value = explode('\\', $class);
-    $name = isset($value1[1]) ?  $value1[1] : $value[count($value) - 1];
-    $name = strtolower(trim($name));
-    $arr[$name] = new $class;
-  }
-  return (object) $arr;
 }
 
 function env($key=null, $value = null)
@@ -93,6 +103,31 @@ function request($key = null)
   if (is_null($key)) $value = $request;
   else $value = $request[$key] ?? $value;
   return $value;
+}
+
+/*Retorna um atributo de classes CSS de forma condicional*/
+function rclass(array $classes)
+{
+   $r = array();
+   foreach($classes as $value=>$bool)
+   {
+     if($bool) $r[] = $value;
+     if(is_numeric($value)) $r[] = $bool;
+   }
+   $r = implode(' ',$r);
+   return 'class="'.$r.'"';
+}
+/*Retorna um atributo de estilo CSS de forma condicional*/
+function rstyle(array $styles)
+{
+   $r = array();
+   foreach($styles as $value=>$bool)
+   {
+     if($bool) $r[] = $value;
+     if(is_numeric($value)) $r[] = $bool;
+   }
+   $r = implode(';',$r);
+   return 'style="'.$r.';"';
 }
 
 function route($name, $params = [])
