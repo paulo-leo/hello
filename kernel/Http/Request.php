@@ -106,7 +106,7 @@ class Request extends FileRequest
     }
 
 
-    public function validate($validations, $messages = array())
+    public function validate(array $validations, $messages = array())
     {
         foreach ($validations as $key => $value) 
         {
@@ -234,9 +234,11 @@ class Request extends FileRequest
 
     public function errors()
     {
-        $this->check();
+        $this->check(); 
         $messages = array();
         foreach ($this->error_keys as $error) {
+
+           // var_dump($this->error_keys);
 
             $errors = explode('.', $error);
             $name = $errors[0];
@@ -261,15 +263,10 @@ class Request extends FileRequest
         return !$this->check();
     }
 
-    public function success()
-    {
-        return !$this->fails();
-    }
-
     public function validated($excepts=array())
     {
         $validated = array();
-        if ($this->success()) {
+        if (!$this->fails()) {
             foreach ($this->validated as $key) {
                 $validated[$key] = $this->get($key);
             }

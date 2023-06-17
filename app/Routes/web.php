@@ -3,6 +3,7 @@
 use Kernel\Router\Route;
 use Kernel\Http\Auth;
 use App\Models\UserModel as User;
+use App\Validations\Rules\CpfRule;
 
 Route::get('/',function(){
     return view('welcome');
@@ -16,8 +17,21 @@ Route::get('*',function(){
     return view('404');
 });
 
-Route::get('teste',function(){ 
+Route::get('teste',function(Kernel\Http\Request $request){ 
       
-    return view('teste');
+        
+        $request->validate(
+        [
+          'nome'=>[new CpfRule]
+        ]);
+
+        if($request->fails())
+        {
+            return $request->errors();
+
+        }else{
+
+            return $request->validated();
+        }
 
 });

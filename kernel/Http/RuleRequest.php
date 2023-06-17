@@ -12,9 +12,8 @@ use Kernel\Http\Request;
     digits: O campo deve ter um número específico de dígitos.
     min: O valor mínimo permitido para o campo.
     max: O valor máximo permitido para o campo.
-    between: O valor do campo deve estar entre um intervalo específico.
-    in: O campo deve corresponder a um valor específico de uma lista.
-    not_in: O campo não deve corresponder a nenhum valor específico de uma lista.
+    is: O campo deve corresponder a um valor específico.
+    not_is: O campo não deve corresponder a nenhum valor específico.
     alpha: O campo deve conter somente caracteres alfabéticos.
     alpha_num: O campo deve conter somente caracteres alfanuméricos.
     alpha_dash: O campo deve conter somente caracteres alfanuméricos, sublinhados e hífens.
@@ -39,9 +38,8 @@ class RuleRequest extends Request
     'numeric' => '/^\d+$/',
     'integer' => '/^[+-]?\d+$/',
     'digits' => '/^\d{#i}$/',
-    'between' => '/^(#min)-(#max)$/',
-    'in' => '/^(#i)$/',
-    'not_in' => '/^(?!.*(?:#i)).+$/',
+    'is' => '/^(#i)$/',
+    'not_is' => '/^(?!.*(?:#i)).+$/',
     'alpha' => '/^[a-zA-Z]+$/',
     'alpha_num' => '/^[a-zA-Z0-9]+$/',
     'alpha_dash' => '/^[a-zA-Z0-9_-]+$/',
@@ -51,11 +49,27 @@ class RuleRequest extends Request
     'exists' => 'exists'
    );
 
+   /*Mensagens de padrão do sistema de validação*/
    private static $messages_defaults = array(
-    'required'=>'O campo "{name}" é obrigatório.',
-    'file'=>'Você deve fazer o upload de arquivo para o campo "{name}".',
-    'size'=>'O tamanho de arquivo é muito grande.',
-    'extension'=>'Extensão de arquivo não permitido para upload.'
+        'required' => 'O campo "{name}" é obrigatório.',
+        'email' => 'O campo "{name}" deve conter um endereço de e-mail válido.',
+        'numeric' => 'O campo "{name}" deve ser um número.',
+        'integer' => 'O campo "{name}" deve ser um número inteiro.',
+        'digits' => 'O campo "{name}" deve ter um número específico de dígitos.',
+        'min' => 'O valor mínimo permitido para o "{name}" campo.',
+        'max' => 'O valor máximo permitido para o "{name}" campo.',
+        'is' => 'O campo "{name}" deve corresponder a um valor específico.',
+        'not_is' => 'O campo "{name}" não deve corresponder a nenhum valor específico.',
+        'alpha' => 'O campo deve conter somente caracteres alfabéticos.',
+        'alpha_num' => 'O campo "{name}" deve conter somente caracteres alfanuméricos.',
+        'alpha_dash' => 'O campo "{name}" deve conter somente caracteres alfanuméricos, sublinhados e hífens.',
+        'regex' => 'O campo "{name}" deve corresponder a uma expressão regular específica.',
+        'confirmed' => 'O campo "{name}" deve ser confirmado por outro campo com o mesmo nome seguido de "_confirmation".',
+        'unique' => 'O valor do "{name}" campo deve ser único em uma determinada tabela de banco de dados.',
+        'exists' => 'O valor do "{name}" campo deve existir em uma determinada tabela de banco de dados.',
+        'file'=>'Você deve fazer o upload de arquivo para o campo "{name}".',
+        'size'=>'O tamanho de arquivo é muito grande.',
+        'extension'=>'Extensão de arquivo não permitido para upload.'
    );
 
    final public static function patterns()
