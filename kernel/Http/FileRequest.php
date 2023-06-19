@@ -2,9 +2,12 @@
 
 namespace Kernel\Http;
 
+use Kernel\Http\Storage;
+
 class FileRequest
 {
   private $files;
+  
 
   public function __construct()
   {
@@ -19,7 +22,7 @@ class FileRequest
      }else return $files;
   }
 
-  
+
   public function getFile($name)
   {
      $files = $this->files[$name] ?? [];
@@ -59,7 +62,9 @@ class FileRequest
          $files[$i]['new_name'] = md5('YmdHis'.$name).'.'.$extension;
          $files[$i]['validated'] = (is_uploaded_file($tpm) 
          && getimagesize($tpm) !== false);
-         $files[$i] = (object) $files[$i];
+         
+         $files[$i] = new Storage($files[$i]);
+       
       }
       return $files;
   }

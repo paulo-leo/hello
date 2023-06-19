@@ -22,22 +22,22 @@ function base_path()
 }
 function public_path()
 {
-    return base_path().DIRECTORY_SEPARATOR.'public';
+    return base_path().DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR;
 }
 
 function storage_path()
 {
-    return base_path().DIRECTORY_SEPARATOR.'storage';
+   return base_path().DIRECTORY_SEPARATOR.'storage';
 }
 
 function config_path()
 {
-  return base_path().DIRECTORY_SEPARATOR.'config';
+  return base_path().DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR;
 }
 
 function resource_path()
 {
-  return base_path().DIRECTORY_SEPARATOR.'resources';
+  return base_path().DIRECTORY_SEPARATOR.'resources'.DIRECTORY_SEPARATOR;
 }
 
 
