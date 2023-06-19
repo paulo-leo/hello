@@ -63,7 +63,7 @@ class Request extends FileRequest
         return $headers;
     }
 
-    public function getHeader($key)
+    public function getHeader(string $key)
     {
         return $this->headers[$key] ?? null;
     }
@@ -181,13 +181,6 @@ class Request extends FileRequest
                 }
             }
 
-            if($key == 'required' && !$value)
-            {
-                  $key_v = "{$name}.{$key}";
-                  $this->error_keys[$key_v] = $key_v;
-                  $this->check *= 0;
-            }
-
             if($key == 'file')
             {
               if(!$this->hasFile($name))
@@ -196,6 +189,14 @@ class Request extends FileRequest
                 $this->error_keys[$key_v] = $key_v;
                 $this->check *= 0; 
               }   
+            }
+
+           
+            if($key == 'required' && !$value)
+            {
+                  $key_v = "{$name}.{$key}";
+                  $this->error_keys[$key_v] = $key_v;
+                  $this->check *= 0;
             }
 
             if($key == 'size')

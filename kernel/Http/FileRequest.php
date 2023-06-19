@@ -19,15 +19,18 @@ class FileRequest
      }else return $files;
   }
 
+  
   public function getFile($name)
   {
      $files = $this->files[$name] ?? [];
      if(count($files) > 0 && is_array($files['name']))
      {
        $files = $this->dividirArray($files);
-     }else{
+     }else
+     {
         $files = count($files) > 0 ? array($files) : $files;
      }
+
      $files = $this->atributesFiles($files);
 
      return $files;
