@@ -20,14 +20,29 @@ function base_path()
 {
     return __DIR__;
 }
+
+function app_path($path='/')
+{
+  $path = "/{$path}/";
+  $path = str_replace('\\','/', $path);
+  $path = str_replace('//','/', $path);
+  $path = str_replace('/',DIRECTORY_SEPARATOR,$path); 
+  $path = str_replace(DIRECTORY_SEPARATOR.DIRECTORY_SEPARATOR,DIRECTORY_SEPARATOR,$path);
+  return base_path().$path;
+}
+
 function public_path()
 {
-    return base_path().DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR;
+    $public = base_path().DIRECTORY_SEPARATOR.'public'.DIRECTORY_SEPARATOR;
+    $public_html = base_path().DIRECTORY_SEPARATOR.'public_html'.DIRECTORY_SEPARATOR;
+
+    return is_dir($public_html) ? $public_html : $public;
+  
 }
 
 function storage_path()
 {
-   return base_path().DIRECTORY_SEPARATOR.'storage';
+   return base_path().DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR;;
 }
 
 function config_path()
