@@ -150,6 +150,7 @@ class View
    private function writeCompiledFile($path, $content)
    {
       $result = $this->transform($content);
+      $result = str_ireplace('@{{','{{',$result);
 
       if (file_put_contents($path, $result) === false) {
          throw new Exception("Não foi possível gravar o arquivo compilado em '{$path}'.");
@@ -171,6 +172,7 @@ class View
       $content = $this->viewFor($content);
       $content = $this->viewEcho($content);
       $content = $this->print($content);
+
       return $content;
    }
 
@@ -198,11 +200,11 @@ class View
    /*Estrutura para impressão*/
    public function viewEcho($file)
    {
-      $echo = "/\{{2}{$this->all}\}{2}/imU";
+      $echo = "/(?<!@){{2}{$this->all}}{2}/imU";
       $echox = "/\{{1}\!{$this->all}\!\}{1}/imU";
       $file = preg_replace($echox, "<?php echo $1; ?>", $file);
       $file = preg_replace($echo, "<?php echo htmlspecialchars(trim($1), ENT_QUOTES); ?>", $file);
-      $file = str_replace('{!{', '{{', $file);
+      
       $file = str_replace(['{--', '--}'], ['<?php /* ?>', '<php */ ?>'], $file);
 
       return $file;

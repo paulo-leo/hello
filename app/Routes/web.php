@@ -42,16 +42,8 @@ Route::get('teste',function(){
 
 Route::post('teste',function(Kernel\Http\Request $request){ 
          
-        $request->validate(
-        [
-          'arquivo'=>'file|extension:jpge,png'
-        ]);
+        
+    return $request->all();
 
-        if($request->fails())
-        {
-            return $request->errors();
 
-        }else{
-           return  $request->file('arquivo')->store();
-        }
 });
