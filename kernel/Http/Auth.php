@@ -45,7 +45,7 @@ class Auth
             /*Executa uma função anônima no caso de sucesso, caso seja informado no segundo parâmetro.*/
             if(is_callable($success))
             {
-               $success();
+               return $success();
             }
 
          }else{

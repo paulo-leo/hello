@@ -24,11 +24,20 @@ class Panel extends Module
         
         #Faz o login do usuário
         Route::post('login',function(Request $request){
+      
+           try{
 
-           $login = array('email','password');
-           $login = $request->only($login);
+               return Auth::login(
+               $request->only(['email','password']),
+               fn() => ['type'=>'success']);
 
-           Auth::login($login,fn() => redirect('panel'));
+           }catch(\Exception $e){
+
+              return ['type'=>'error',
+                     'msg'=>"[{$e->getCode()}] - {$e->getMessage()}"];
+
+           }
+
         });
         
         #Destroí a sessão atual do usuário logado
