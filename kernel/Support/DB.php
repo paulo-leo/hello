@@ -790,7 +790,7 @@ class DB
        'previous'=>$btn_previous,
        'last'=>$last,
        'links'=> $links,
-       'data'=>$this->get()
+       'items'=>$this->get()
     );
    }
 

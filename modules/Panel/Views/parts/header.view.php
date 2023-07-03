@@ -10,10 +10,10 @@
 
         {if auth('admin')}
            <li class="nav-item">
-              <a class="nav-link" href="#">Listar usuários</a>
+              <a class="nav-link" href="{{url('panel/users')}}">Usuários</a>
            </li>
            <li class="nav-item">
-             <a class="nav-link" href="#">Adicionar usuário</a>
+             <a class="nav-link border border-success" href="{{url('panel/users/create')}}">Adicionar usuário</a>
            </li>
         {/if}
 
@@ -21,13 +21,18 @@
       <span class="navbar-text">
        
       <div class="btn-group">
-  <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      {{session()->get('first_name')}}
+  <button type="button" class="btn dropdown-toggle p-1" data-bs-toggle="dropdown" aria-expanded="false">
+  <i class="bi-person-circle"></i>
+      
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item" type="button">Editar perfil</button></li>
+    <li><b class="dropdown-item">{{session()->get('name')}}</b></li>
     <li><hr class="dropdown-divider"></li>
-    <li><a href="{{url('logout')}}" class="dropdown-item text-danger">Encerra sessão</a></li>
+    <li><button class="dropdown-item" type="button">
+    <i class="bi-person-fill-gear text-primary"></i> Configurações</button></li>
+    <li>
+      <a href="{{url('logout')}}" class="dropdown-item"><i class="bi-box-arrow-right text-danger"></i> Encerra sessão</a>
+    </li>
   </ul>
 </div>
 

@@ -37,7 +37,7 @@ class Panel extends Module
                      'msg'=>"[{$e->getCode()}] - {$e->getMessage()}"];
 
            }
-
+  
         });
         
         #Destroí a sessão atual do usuário logado
@@ -49,6 +49,16 @@ class Panel extends Module
       /*Página inicial do painel admistrativo*/ 
       Route::get('panel',fn() => view('@panel.pages.index'))
       ->middleware('auth');
+
+
+
+      Route::group(array(
+        'prefix'=>'panel'
+      ),function(){
+
+        Route::resources('users','@Panel/Controllers/UserController');
+
+      });
 
     }
 

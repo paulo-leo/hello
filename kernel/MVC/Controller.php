@@ -1,18 +1,13 @@
 <?php
 namespace Kernel\MVC;
 
+use Exception;
+
 class Controller
 {
 
-   protected $dep = array();
-
-   public function __construct()
-   {
-      $this->dep = build($this->dep);
-   }
-
    function __call($name,$params)
    {
-      return "Método \"{$name}\" não implementado.";
+      throw new Exception("Método \"{$name}\" não implementado.");
    }
 }

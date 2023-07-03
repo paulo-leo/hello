@@ -46,7 +46,8 @@ const app = Vue.createApp({
     }
   },
   methods: {
-    login(event) {
+     
+    login(event){
 
       event.preventDefault();
       this.loading = true;

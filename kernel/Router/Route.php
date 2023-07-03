@@ -178,6 +178,9 @@ class Route
             self::init()->createget("{$route}/create","{$callback}@create")
             ->name("{$route}.create");
 
+            self::init()->createget("{$route}/all","{$callback}@records")
+            ->name("{$route}.records");
+
             self::init()->createpost($route,"{$callback}@store")
             ->name("{$route}.store");
 
